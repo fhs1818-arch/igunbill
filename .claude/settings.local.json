@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(python -c \"import pandas, requests, openpyxl, lxml; print\\('OK'\\)\" 2>&1)",
+      "PowerShell(python --version; python -c \"import pandas; print\\('pandas OK'\\)\")",
+      "PowerShell(py *)",
+      "Skill(run)"
+    ]
+  }
+}

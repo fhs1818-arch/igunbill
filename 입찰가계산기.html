@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경매 입찰가 계산기</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+  background: #f2f4f7;
+  color: #1a202c;
+  min-height: 100vh;
+}
+
+header {
+  background: #1a2e4a;
+  color: white;
+  padding: 18px 28px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+header small {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.55;
+  margin-left: 10px;
+}
+
+.wrap {
+  max-width: 860px;
+  margin: 28px auto;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+@media (max-width: 680px) { .wrap { grid-template-columns: 1fr; } }
+
+/* ── 카드 ── */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 22px 20px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+}
+.card.full { grid-column: 1 / -1; }
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a6fa5;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eef2f8;
+}
+
+/* 기본정보 2열 그리드 */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── 입력 ── */
+.field { margin-bottom: 13px; }
+.field:last-child { margin-bottom: 0; }
+.field > label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #718096;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.input-row {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafbfc;
+  transition: border 0.15s;
+}
+.input-row:focus-within { border-color: #4a6fa5; background: white; }
+.input-row input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 9px 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #1a202c;
+  min-width: 0;
+}
+.input-row input:focus { outline: none; }
+.input-row .unit {
+  padding: 0 10px;
+  font-size: 12px;
+  color: #a0aec0;
+  white-space: nowrap;
+  border-left: 1px solid #e2e8f0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+}
+
+/* 확인필요 뱃지 */
+.badge-check {
+  display: inline-block;
+  padding: 1px 7px;
+  background: #fff5f5;
+  color: #e53e3e;
+  border: 1px solid #fed7d7;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.badge-check:hover { background: #fed7d7; }
+
+.arrears-warn {
+  display: none;
+  margin-top: 6px;
+  padding: 9px 12px;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-radius: 7px;
+  font-size: 12px;
+  color: #c53030;
+  line-height: 1.6;
+}
+.arrears-warn.show { display: block; }
+
+/* 목표수익 버튼 */
+.profit-btns { display: flex; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
+.profit-btn {
+  flex: 1;
+  min-width: 60px;
+  padding: 7px 4px;
+  border: 1.5px solid #cbd5e0;
+  border-radius: 7px;
+  background: white;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.profit-btn:hover { border-color: #4a6fa5; color: #4a6fa5; }
+.profit-btn.active { background: #1a2e4a; border-color: #1a2e4a; color: white; }
+
+/* 자동계산 항목 */
+.auto-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: #f7f9fc;
+  border: 1.5px dashed #d0d8e8;
+  border-radius: 8px;
+  margin-bottom: 13px;
+}
+.auto-field:last-child { margin-bottom: 0; }
+.auto-field .af-label { font-size: 12px; color: #718096; font-weight: 600; }
+.auto-field .af-val { font-size: 14px; font-weight: 700; color: #4a6fa5; }
+
+/* ── 결과 카드 ── */
+.result-card {
+  grid-column: 1 / -1;
+  background: #1a2e4a;
+  border-radius: 14px;
+  padding: 28px 24px;
+  color: white;
+  box-shadow: 0 4px 20px rgba(26,46,74,0.25);
+}
+.result-card .card-title { color: #90afd4; border-bottom-color: rgba(255,255,255,0.1); }
+
+.max-bid-wrap { text-align: center; padding: 20px 0 24px; }
+.max-bid-label { font-size: 13px; opacity: 0.6; margin-bottom: 8px; letter-spacing: 0.5px; }
+.max-bid-val {
+  font-size: 48px;
+  font-weight: 800;
+  color: #fbd38d;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.max-bid-unit { font-size: 18px; font-weight: 400; opacity: 0.7; margin-left: 4px; }
+.max-bid-sub { font-size: 13px; opacity: 0.55; margin-top: 8px; }
+
+/* 결과 통계 그리드 */
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+@media (max-width: 600px) { .result-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.rg-item {
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.rg-item .rg-label { font-size: 10px; opacity: 0.6; margin-bottom: 5px; line-height: 1.3; }
+.rg-item .rg-val { font-size: 15px; font-weight: 700; }
+.rg-item .rg-val.green { color: #68d391; }
+.rg-item .rg-val.yellow { color: #fbd38d; }
+.rg-item .rg-val.red { color: #fc8181; }
+.rg-item .rg-val.cyan { color: #76e4f7; }
+
+/* 비용 내역 */
+.cost-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+.cost-table tr td { padding: 7px 6px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.cost-table tr td:last-child { text-align: right; font-weight: 600; }
+.cost-table tr.ct-auto td { color: #90cdf4; }
+.cost-table tr.ct-subtotal td {
+  font-size: 13px;
+  font-weight: 700;
+  color: #a0c4e8;
+  background: rgba(255,255,255,0.04);
+  border-top: 1px solid rgba(255,255,255,0.15);
+  padding: 9px 6px;
+}
+.cost-table tr.ct-total td {
+  font-size: 14px; font-weight: 700; color: #fbd38d;
+  border-top: 1px solid rgba(255,255,255,0.2); border-bottom: none; padding-top: 10px;
+}
+
+.after-tax-box {
+  margin-top: 18px;
+  background: rgba(104,211,145,0.12);
+  border: 1.5px solid rgba(104,211,145,0.3);
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.after-tax-box .at-label { font-size: 13px; opacity: 0.8; }
+.after-tax-box .at-val { font-size: 22px; font-weight: 800; color: #68d391; }
+
+/* ── 입찰 시나리오 ── */
+.scenario-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #90afd4;
+  margin: 22px 0 12px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 500px) { .scenario-grid { grid-template-columns: 1fr; } }
+
+.sc-item {
+  border-radius: 10px;
+  padding: 14px 12px;
+  text-align: center;
+}
+.sc-item.conservative { background: rgba(104,211,145,0.10); border: 1.5px solid rgba(104,211,145,0.25); }
+.sc-item.recommend    { background: rgba(251,211,141,0.12); border: 1.5px solid rgba(251,211,141,0.35); }
+.sc-item.aggressive   { background: rgba(252,129,129,0.10); border: 1.5px solid rgba(252,129,129,0.25); }
+
+.sc-item .sc-label { font-size: 11px; font-weight: 700; opacity: 0.7; margin-bottom: 6px; }
+.sc-item .sc-val { font-size: 20px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+.sc-item.conservative .sc-val { color: #68d391; }
+.sc-item.recommend    .sc-val { color: #fbd38d; }
+.sc-item.aggressive   .sc-val { color: #fc8181; }
+.sc-item .sc-sub { font-size: 11px; opacity: 0.5; }
+
+.warn-box {
+  margin-top: 14px;
+  background: rgba(252,129,129,0.12);
+  border: 1.5px solid rgba(252,129,129,0.3);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #fc8181;
+  display: none;
+}
+
+@media print {
+  body { background: white; }
+  header, .result-card { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<header>🏠 경매 입찰가 계산기 <small>역산 방식 · 최대 입찰가 산정</small></header>
+
+<div class="wrap">
+
+  <!-- 경매 기본 정보 -->
+  <div class="card full">
+    <div class="card-title">🏛️ 경매 기본 정보</div>
+    <div class="grid2">
+      <div class="field">
+        <label>감정가</label>
+        <div class="input-row">
+          <input type="number" id="appraisal" value="" placeholder="0" min="0" step="100" oninput="calc()">
+          <span class="unit">만원</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>최저입찰가</label>
+        <div class="input-row">
+          <input type="number" id="minBid" value="" placeholder="0" min="0" step="100" oninput="calc()">
+          <span class="unit">만원</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 매도가 + 목표수익 -->
+  <div class="card">
+    <div class="card-title">💰 매도 정보 · 목표수익</div>
+
+    <div class="field">
+      <label>예상 매도가</label>
+      <div class="input-row">
+        <input type="number" id="salePrice" value="25000" min="0" step="100" oninput="calc()">
+        <span class="unit">만원</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>목표수익 (세전)</label>
+      <div class="profit-btns">
+        <button class="profit-btn" onclick="setProfit(500,this)">500만</button>
+        <button class="profit-btn active" onclick="setProfit(700,this)">700만</button>
+        <button class="profit-btn" onclick="setProfit(1000,this)">1000만</button>
+        <button class="profit-btn" onclick="setProfit(1500,this)">1500만</button>
+      </div>
+      <div class="input-row">
+        <input type="number" id="targetProfit" value="700" min="0" step="100" oninput="clearActive();calc()">
+        <span class="unit">만원</span>
+      </div>
+    </div>
+
+    <div class="auto-field">
+      <span class="af-label">매도 중개수수료 (매도가 × 0.5%)</span>
+      <span class="af-val" id="agentFeeDisp">—</span>
+    </div>
+
+    <div class="auto-field">
+      <span class="af-label">종합소득세 (누진세율 적용, 지방세 포함)</span>
+      <span class="af-val" id="incomeTaxDisp">—</span>
+    </div>
+  </div>
+
+  <!-- 비용 입력 -->
+  <div class="card">
+    <div class="card-title">🔧 비용 입력</div>
+
+    <div class="field">
+      <label>취득세율</label>
+      <div class="input-row">
+        <input type="number" id="acqTaxRate" value="1.1" min="0" max="15" step="0.1" oninput="calc()">
+        <span class="unit">%</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>법무사 + 등기비</label>
+      <div class="input-row">
+        <input type="number" id="legalFee" value="80" min="0" step="10" oninput="calc()">
+        <span class="unit">만원</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>명도비</label>
+      <div class="input-row">
+        <input type="number" id="eviction" value="150" min="0" step="50" oninput="calc()">
+        <span class="unit">만원</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>
+        체납관리비
+        <span class="badge-check" onclick="toggleArrearsWarn()">확인필요</span>
+      </label>
+      <div class="input-row">
+        <input type="number" id="arrears" value="" placeholder="0" min="0" step="10" oninput="calc()">
+        <span class="unit">만원</span>
+      </div>
+      <div class="arrears-warn" id="arrearsWarn">
+        ⚠️ 체납관리비는 관리사무소에 직접 확인하세요.<br>
+        낙찰자가 일부 또는 전액 인수해야 할 수 있으며,<br>
+        금액에 따라 입찰가에 큰 영향을 줍니다.
+      </div>
+    </div>
+
+    <div class="field">
+      <label>수리비</label>
+      <div class="input-row">
+        <input type="number" id="repair" value="200" min="0" step="50" oninput="calc()">
+        <span class="unit">만원</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>대출이자</label>
+      <div class="input-row">
+        <input type="number" id="interest" value="150" min="0" step="50" oninput="calc()">
+        <span class="unit">만원</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>예비비</label>
+      <div class="input-row">
+        <input type="number" id="reserve" value="150" min="0" step="50" oninput="calc()">
+        <span class="unit">만원</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 결과 -->
+  <div class="result-card">
+    <div class="card-title">📊 입찰가 산정 결과</div>
+
+    <div class="max-bid-wrap">
+      <div class="max-bid-label">최대 입찰 가능가</div>
+      <div>
+        <span class="max-bid-val" id="maxBidVal">—</span>
+        <span class="max-bid-unit">만원</span>
+      </div>
+      <div class="max-bid-sub" id="maxBidSub"></div>
+    </div>
+
+    <div class="result-grid" id="resultGrid"></div>
+
+    <table class="cost-table" id="costTable"></table>
+
+    <div class="after-tax-box">
+      <span class="at-label">세후 실수령 수익<br><small style="opacity:0.6">목표수익 − 종합소득세(누진세+지방세)</small></span>
+      <span class="at-val" id="afterTaxVal">—</span>
+    </div>
+
+    <!-- 입찰 경쟁 시나리오 -->
+    <div class="scenario-title">🎯 입찰 경쟁 시나리오 (10만원 단위 반올림)</div>
+    <div class="scenario-grid" id="scenarioGrid"></div>
+
+    <div class="warn-box" id="warnBox"></div>
+  </div>
+
+</div>
+
+<script>
+function n(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function fmt(v) { return Math.round(v).toLocaleString('ko-KR') + ' 만원'; }
+function fmtN(v) { return Math.round(v).toLocaleString('ko-KR'); }
+function round10(v) { return Math.round(v / 10) * 10; }
+function pct(a, b) { return b > 0 ? (a / b * 100).toFixed(1) + '%' : '–'; }
+
+function setProfit(val, btn) {
+  document.getElementById('targetProfit').value = val;
+  document.querySelectorAll('.profit-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  calc();
+}
+function clearActive() {
+  document.querySelectorAll('.profit-btn').forEach(b => b.classList.remove('active'));
+}
+function toggleArrearsWarn() {
+  document.getElementById('arrearsWarn').classList.toggle('show');
+}
+
+// 2026년 기준 종합소득세 누진세율표 (단위: 만원, 누진공제는 만원)
+const TAX_BRACKETS = [
+  { limit: 1400,     rate: 0.06, deduction: 0    },
+  { limit: 5000,     rate: 0.15, deduction: 126  },
+  { limit: 8800,     rate: 0.24, deduction: 576  },
+  { limit: 15000,    rate: 0.35, deduction: 1544 },
+  { limit: 30000,    rate: 0.38, deduction: 1994 },
+  { limit: 50000,    rate: 0.40, deduction: 2594 },
+  { limit: 100000,   rate: 0.42, deduction: 3594 },
+  { limit: Infinity, rate: 0.45, deduction: 6594 },
+];
+
+// 과세표준(만원) -> { tax: 종합소득세, rate, deduction, local: 지방소득세(10%), total }
+function calcIncomeTax(base) {
+  if (base <= 0) return { tax: 0, rate: 0, deduction: 0, local: 0, total: 0 };
+  const bracket = TAX_BRACKETS.find(b => base <= b.limit);
+  const tax = Math.max(base * bracket.rate - bracket.deduction, 0);
+  const local = tax * 0.1;
+  return { tax, rate: bracket.rate, deduction: bracket.deduction, local, total: tax + local };
+}
+
+function calc() {
+  const salePrice    = n('salePrice');
+  const targetProfit = n('targetProfit');
+  const acqTaxRate   = n('acqTaxRate') / 100;
+  const legalFee     = n('legalFee');
+  const eviction     = n('eviction');
+  const arrears      = n('arrears');
+  const repair       = n('repair');
+  const interest     = n('interest');
+  const reserve      = n('reserve');
+  const appraisal    = n('appraisal');
+  const minBid       = n('minBid');
+
+  // 자동계산
+  const agentFee  = salePrice * 0.005;
+  const taxResult = calcIncomeTax(targetProfit);
+  const incomeTax = taxResult.total; // 종합소득세 + 지방소득세 합산
+  const afterTax  = targetProfit - incomeTax;
+
+  document.getElementById('agentFeeDisp').textContent  = fmt(agentFee);
+  document.getElementById('incomeTaxDisp').textContent =
+    targetProfit > 0
+      ? `${fmt(incomeTax)} (${(taxResult.rate*100).toFixed(0)}%, 누진공제 ${fmtN(taxResult.deduction)})`
+      : '—';
+
+  // 역산: 최대입찰가 = (매도가 - 고정비용 - 목표수익) / (1 + 취득세율)
+  const fixedCosts = legalFee + eviction + arrears + repair + interest + reserve + agentFee + incomeTax;
+  const maxBid     = (salePrice - fixedCosts - targetProfit) / (1 + acqTaxRate);
+  const acqTax     = maxBid * acqTaxRate;
+  const totalCost  = maxBid + acqTax + fixedCosts;
+
+  // 비율
+  const vsAppraisal = pct(maxBid, appraisal);
+  const vsMinBid    = pct(maxBid, minBid);
+  const vsSale      = salePrice > 0 ? (maxBid / salePrice * 100).toFixed(1) + '%' : '–';
+
+  // 최대입찰가 표시
+  document.getElementById('maxBidVal').textContent = maxBid > 0 ? fmtN(maxBid) : '–';
+  document.getElementById('maxBidSub').textContent =
+    maxBid > 0 ? `매도가의 ${vsSale} · 취득세 ${fmt(acqTax)}` : '';
+
+  // 통계 그리드 (5칸)
+  document.getElementById('resultGrid').innerHTML = `
+    <div class="rg-item">
+      <div class="rg-label">예상 매도가</div>
+      <div class="rg-val yellow">${salePrice > 0 ? fmt(salePrice) : '–'}</div>
+    </div>
+    <div class="rg-item">
+      <div class="rg-label">총 투입비용</div>
+      <div class="rg-val">${maxBid > 0 ? fmt(totalCost) : '–'}</div>
+    </div>
+    <div class="rg-item">
+      <div class="rg-label">세전 목표수익</div>
+      <div class="rg-val green">${fmt(targetProfit)}</div>
+    </div>
+    <div class="rg-item">
+      <div class="rg-label">감정가 대비<br>낙찰가율</div>
+      <div class="rg-val cyan">${appraisal > 0 ? vsAppraisal : '–'}</div>
+    </div>
+    <div class="rg-item">
+      <div class="rg-label">최저가 대비<br>낙찰가율</div>
+      <div class="rg-val cyan">${minBid > 0 ? vsMinBid : '–'}</div>
+    </div>
+  `;
+
+  // 비용 내역: 개별항목 → 추가비용합계 → 최대입찰가 → 총비용합계
+  const addlCosts = acqTax + fixedCosts; // 낙찰가 제외 전체 부대비용
+  const itemRows = [
+    ['취득세 (' + n('acqTaxRate') + '%)', acqTax,    false],
+    ['법무사 + 등기비',                   legalFee,  false],
+    ['명도비',                            eviction,  false],
+    ['체납관리비',                        arrears,   false],
+    ['수리비',                            repair,    false],
+    ['대출이자',                          interest,  false],
+    ['예비비',                            reserve,   false],
+    ['매도 중개수수료 (0.5%)',            agentFee,  true ],
+    [`종합소득세+지방세 (${(taxResult.rate*100).toFixed(0)}%, 누진공제 ${fmtN(taxResult.deduction)})`, incomeTax, true ],
+  ];
+  let tableHtml = itemRows.map(([label, val, isAuto]) => {
+    if (val === 0) return '';
+    return `<tr class="${isAuto ? 'ct-auto' : ''}"><td>${label}</td><td>${fmt(val)}</td></tr>`;
+  }).join('');
+  tableHtml += `<tr class="ct-subtotal"><td>추가 비용 합계</td><td>${maxBid > 0 ? fmt(addlCosts) : '–'}</td></tr>`;
+  tableHtml += `<tr><td>낙찰가 (최대)</td><td>${maxBid > 0 ? fmt(maxBid) : '–'}</td></tr>`;
+  tableHtml += `<tr class="ct-total"><td>총 비용 합계</td><td>${maxBid > 0 ? fmt(totalCost) : '–'}</td></tr>`;
+  document.getElementById('costTable').innerHTML = tableHtml;
+
+  // 세후 실수령
+  document.getElementById('afterTaxVal').textContent = fmt(afterTax);
+
+  // 시나리오
+  if (maxBid > 0) {
+    const sc1 = round10(maxBid * 0.985);
+    const sc2 = round10(maxBid * 0.993);
+    const sc3 = round10(maxBid * 0.999);
+    const scMin1 = minBid > 0 ? ' (최저가+' + fmtN(sc1 - minBid) + ')' : '';
+    const scMin2 = minBid > 0 ? ' (최저가+' + fmtN(sc2 - minBid) + ')' : '';
+    const scMin3 = minBid > 0 ? ' (최저가+' + fmtN(sc3 - minBid) + ')' : '';
+    document.getElementById('scenarioGrid').innerHTML = `
+      <div class="sc-item conservative">
+        <div class="sc-label">보수적 (×98.5%)</div>
+        <div class="sc-val">${fmtN(sc1)}</div>
+        <div class="sc-sub">만원${scMin1}</div>
+      </div>
+      <div class="sc-item recommend">
+        <div class="sc-label">추천 (×99.3%)</div>
+        <div class="sc-val">${fmtN(sc2)}</div>
+        <div class="sc-sub">만원${scMin2}</div>
+      </div>
+      <div class="sc-item aggressive">
+        <div class="sc-label">공격적 (×99.9%)</div>
+        <div class="sc-val">${fmtN(sc3)}</div>
+        <div class="sc-sub">만원${scMin3}</div>
+      </div>
+    `;
+  } else {
+    document.getElementById('scenarioGrid').innerHTML =
+      '<div style="opacity:0.4;font-size:13px;grid-column:1/-1">최대입찰가 계산 후 표시됩니다.</div>';
+  }
+
+  // 경고
+  const warn = document.getElementById('warnBox');
+  if (maxBid <= 0) {
+    warn.style.display = 'block';
+    warn.textContent = '⚠️ 입력한 비용과 목표수익이 예상 매도가를 초과합니다. 비용을 줄이거나 목표수익을 낮춰주세요.';
+  } else {
+    warn.style.display = 'none';
+  }
+}
+
+calc();
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoomStatus {
+  VACANT
+  OCCUPIED
+  MOVE_OUT_SOON
+}
+
+enum PaymentStatus {
+  SCHEDULED
+  PAID
+  OVERDUE
+}
+
+enum RepairPayer {
+  LANDLORD
+  TENANT
+}
+
+enum RepairCategory {
+  REPAIR
+  SUPPLIES
+  BROKERAGE
+  OTHER
+}
+
+model Room {
+  id          Int           @id @default(autoincrement())
+  roomNumber  String        @unique
+  tenantName  String?
+  tenantPhone String?
+  status      RoomStatus    @default(VACANT)
+  deposit     Int           @default(0)
+  monthlyRent Int           @default(0)
+  rentDueDay  Int           @default(5)
+  moveInDate  String?
+  moveOutDate String?
+  memo        String?
+  payments    RentPayment[]
+  repairs     Repair[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model RentPayment {
+  id           Int           @id @default(autoincrement())
+  roomId       Int
+  room         Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  paymentMonth String
+  monthlyRent  Int
+  paidDate     DateTime?
+  status       PaymentStatus @default(SCHEDULED)
+  memo         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([roomId, paymentMonth])
+}
+
+model Repair {
+  id          Int         @id @default(autoincrement())
+  roomId      Int
+  room        Room        @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  date        DateTime
+  category    RepairCategory @default(REPAIR)
+  itemName    String
+  description String
+  amount      Int
+  payer       RepairPayer
+  isPaid      Boolean     @default(false)
+  memo        String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}

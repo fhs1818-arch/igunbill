@@ -4,10 +4,11 @@
 
 ## 기술 스택
 
-- Next.js
+- Next.js App Router
 - TypeScript
 - Prisma
 - PostgreSQL
+- Supabase Auth
 - Tailwind CSS
 
 ## 메뉴
@@ -24,9 +25,19 @@ Vercel 배포에서는 Vercel Marketplace의 Prisma Postgres 또는 Neon Postgre
 
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public&sslmode=require"
+NEXT_PUBLIC_SUPABASE_URL="https://YOUR_PROJECT_REF.supabase.co"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY"
 ```
 
 `prisma/schema.prisma`는 `provider = "postgresql"`와 `url = env("DATABASE_URL")`를 사용합니다. SQLite `prisma/dev.db`에는 더 이상 의존하지 않습니다.
+
+## 관리자 로그인
+
+관리자 로그인은 Supabase Auth의 이메일/비밀번호 로그인을 사용합니다.
+
+- 회원가입 화면은 제공하지 않습니다.
+- Supabase Dashboard에서 관리자 계정을 미리 생성하세요.
+- 로그인하지 않은 사용자는 `/login`을 제외한 모든 페이지에 접근할 수 없습니다.
 
 ## 운영 모드
 
@@ -49,7 +60,13 @@ vercel
 - Prisma Postgres
 - Neon Postgres
 
-3. 연결 후 Vercel 프로젝트의 Environment Variables에 `DATABASE_URL`이 등록되어 있는지 확인합니다.
+3. Vercel 프로젝트의 Environment Variables를 설정합니다.
+
+```text
+DATABASE_URL
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+```
 
 4. 배포 빌드 명령은 아래 스크립트를 사용합니다.
 
@@ -57,9 +74,15 @@ vercel
 npm run vercel-build
 ```
 
-이 스크립트는 `prisma generate`, `prisma migrate deploy`, `next build`를 순서대로 실행합니다.
+이 스크립트는 `prisma generate`, `next build`만 실행합니다. `prisma migrate deploy`는 Vercel 빌드 중 실행하지 않습니다.
 
-5. 프로덕션 배포는 아래 명령으로 진행합니다.
+5. DB migration이 필요할 때만 수동으로 실행합니다.
+
+```bash
+npm run prisma:deploy
+```
+
+6. 프로덕션 배포는 아래 명령으로 진행합니다.
 
 ```bash
 vercel --prod
@@ -67,7 +90,7 @@ vercel --prod
 
 ## 로컬 실행
 
-로컬에서 실행하려면 PostgreSQL 연결 문자열을 `.env`에 설정합니다.
+로컬에서 실행하려면 PostgreSQL 연결 문자열과 Supabase Auth 환경변수를 `.env`에 설정합니다.
 
 ```bash
 npm install

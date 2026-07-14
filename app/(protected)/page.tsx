@@ -8,7 +8,7 @@ import { Section } from "@/components/ui/Section";
 import { StatCard } from "@/components/ui/StatCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
-import { addMonths, monthKey, monthLabel, won } from "@/lib/format";
+import { addMonths, monthKey, monthLabel } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { syncRentPaymentsForAllRooms } from "@/lib/rent-sync";
 
@@ -245,12 +245,6 @@ export default async function DashboardPage({
       value: vacantRoomCount
     }
   ];
-  const quickActions = [
-    { href: "/rooms", label: "호실 관리" },
-    { href: "/payments", label: "월세 관리" },
-    { href: "/repairs", label: "수리 관리" },
-    { href: "/tax", label: "세무" }
-  ];
   const yearlyStats = [
     { label: "올해 총 월세 예정금액", value: yearlyRentTotal },
     { label: "올해 총 입금완료 금액", value: yearlyPaidTotal, tone: "positive" as const },
@@ -267,34 +261,36 @@ export default async function DashboardPage({
   return (
     <>
       <PageHeader title="대시보드" description={`${monthLabel(selectedMonth)} 기준 이건빌 현황`} />
-      <section className="space-y-4 p-4 pb-24 md:p-8 md:pb-8">
+      <section className="space-y-3 p-4 pb-24 md:p-8 md:pb-8">
         {restoreStatus === "success" ? (
           <AppCard className="border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-700">
             백업 복원이 완료되었습니다.
           </AppCard>
         ) : null}
 
-        <div className="flex items-center justify-between gap-3">
-          <ActionLink className="px-3 py-2 text-xs" href={`/?month=${prevMonth}`}>
-            이전달
-          </ActionLink>
-          <div className="rounded-full border border-line bg-white px-4 py-2 text-sm font-bold text-ink shadow-sm shadow-slate-200/40">
-            {monthLabel(selectedMonth)}
+        <div className="flex items-center justify-center">
+          <div className="inline-grid grid-cols-[40px_1fr_40px] items-center rounded-full border border-line bg-white px-2 py-1.5 shadow-sm shadow-slate-200/40">
+            <ActionLink className="min-h-8 border-transparent bg-transparent px-2 py-1 text-lg leading-none hover:bg-slate-100" href={`/?month=${prevMonth}`}>
+              〈
+            </ActionLink>
+            <div className="min-w-32 px-2 text-center text-sm font-bold text-ink">
+              {monthLabel(selectedMonth)}
+            </div>
+            <ActionLink className="min-h-8 border-transparent bg-transparent px-2 py-1 text-lg leading-none hover:bg-slate-100" href={`/?month=${nextMonth}`}>
+              〉
+            </ActionLink>
           </div>
-          <ActionLink className="px-3 py-2 text-xs" href={`/?month=${nextMonth}`}>
-            다음달
-          </ActionLink>
         </div>
 
-        <AppCard className="overflow-hidden p-5 md:p-7">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <div className="mb-3 flex flex-wrap items-center gap-2">
+        <AppCard className="overflow-hidden p-4 md:p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
                 <StatusBadge tone={monthlyNetIncome >= 0 ? "positive" : "negative"}>이번 달 순수익</StatusBadge>
                 <StatusBadge tone="default">오늘 할 일 {todoCount}건</StatusBadge>
               </div>
-              <p className="text-sm font-semibold text-slate-500">입금완료 월세에서 수리비와 중개비를 뺀 금액</p>
-              <p className="mt-3 text-4xl font-bold tracking-normal text-ink md:text-5xl">
+              <p className="text-sm font-semibold text-slate-500">입금완료 월세 - 수리비 - 중개비</p>
+              <p className="mt-2 text-4xl font-bold tracking-normal text-ink md:text-5xl">
                 <MoneyText
                   amount={monthlyNetIncome}
                   className="text-4xl md:text-5xl"
@@ -302,70 +298,58 @@ export default async function DashboardPage({
                 />
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:min-w-[520px]">
-              <div className="rounded-lg bg-slate-50 p-3">
-                <p className="text-xs font-bold text-slate-500">입금완료</p>
-                <p className="mt-1 text-lg font-bold text-emerald-700">{won(monthlyPaidTotal)}</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-3">
-                <p className="text-xs font-bold text-slate-500">월세 예정</p>
-                <p className="mt-1 text-lg font-bold text-ink">{won(monthlyRentTotal)}</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-3">
-                <p className="text-xs font-bold text-slate-500">총 보증금</p>
-                <p className="mt-1 text-lg font-bold text-ink">{won(totalDeposit)}</p>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-3">
-                <p className="text-xs font-bold text-slate-500">미납 금액</p>
-                <p className="mt-1 text-lg font-bold text-red-700">{won(monthlyOverdueTotal)}</p>
-              </div>
-            </div>
           </div>
         </AppCard>
 
-        <Section title="오늘 할 일" description="매일 확인해야 하는 핵심 알림입니다.">
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <StatCard
+            className="p-3"
+            label="입금완료"
+            tone="positive"
+            value={<MoneyText amount={monthlyPaidTotal} tone="positive" />}
+          />
+          <StatCard className="p-3" label="월세예정" value={<MoneyText amount={monthlyRentTotal} />} />
+          <StatCard className="p-3" label="총보증금" value={<MoneyText amount={totalDeposit} />} />
+          <StatCard
+            className="p-3"
+            label="미납금액"
+            tone="negative"
+            value={<MoneyText amount={monthlyOverdueTotal} tone="negative" />}
+          />
+        </div>
+
+        <Section title="오늘 할 일" description="매일 확인해야 하는 핵심 알림입니다." className="p-4">
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             {alertCards.map((card) => (
               <Link key={card.label} href={card.href}>
-                <AppCard className="h-full p-4 transition hover:border-brand">
+                <AppCard className="h-full p-3 transition hover:border-brand">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-sm font-bold text-slate-600">{card.label}</p>
                     <StatusBadge tone={card.tone}>{card.note}</StatusBadge>
                   </div>
-                  <p className="mt-4 text-3xl font-bold text-ink">{card.value}건</p>
+                  <p className="mt-2 text-2xl font-bold text-ink">{card.value}건</p>
                 </AppCard>
               </Link>
             ))}
           </div>
         </Section>
 
-        <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
-          <Section title="이번 달 지출" description="순수익 계산에 반영되는 비용입니다.">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <StatCard label="수리비" value={<MoneyText amount={monthlyRepairTotal} />} />
-              <StatCard label="중개비" value={<MoneyText amount={monthlyBrokerageTotal} />} />
-            </div>
-          </Section>
-
-          <Section title="빠른 실행" description="자주 쓰는 관리 화면으로 바로 이동합니다.">
-            <div className="grid grid-cols-2 gap-3">
-              {quickActions.map((action) => (
-                <ActionLink key={action.href} className="w-full justify-center py-3" href={action.href} variant="secondary">
-                  {action.label}
-                </ActionLink>
-              ))}
-            </div>
-          </Section>
-        </div>
+        <Section title="이번 달 지출" description="순수익 계산에 반영되는 비용입니다." className="p-4">
+          <div className="grid grid-cols-2 gap-3">
+            <StatCard className="p-3" label="수리비" value={<MoneyText amount={monthlyRepairTotal} />} />
+            <StatCard className="p-3" label="중개비" value={<MoneyText amount={monthlyBrokerageTotal} />} />
+          </div>
+        </Section>
 
         {isAdmin ? (
           <Section
             actions={<ActionLink href="/audit-logs">전체 보기</ActionLink>}
             title="최근 활동"
             description="최근 관리자 작업 이력입니다."
+            className="p-4"
           >
             {recentAuditLogs.length > 0 ? (
-              <div className="grid gap-3">
+              <div className="grid gap-2">
                 {recentAuditLogs.map((log) => (
                   <AppCard key={log.id} className="bg-slate-50 p-3 shadow-none md:grid md:grid-cols-[140px_1fr_160px_2fr] md:gap-3">
                     <div className="text-sm font-bold text-slate-500">{formatKoreanDate(log.createdAt)}</div>
@@ -381,11 +365,12 @@ export default async function DashboardPage({
           </Section>
         ) : null}
 
-        <Section title={`${selectedYear}년 1월~${Number(selectedMonth.slice(5, 7))}월 누적 요약`}>
+        <Section title={`${selectedYear}년 1월~${Number(selectedMonth.slice(5, 7))}월 누적 요약`} className="p-4">
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {yearlyStats.map((stat) => (
               <StatCard
                 key={stat.label}
+                className="p-3"
                 label={stat.label}
                 tone={stat.tone ?? "default"}
                 value={<MoneyText amount={stat.value} tone={stat.tone ?? "default"} />}

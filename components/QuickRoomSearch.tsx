@@ -22,13 +22,13 @@ export function QuickRoomSearch({
 
   return (
     <form onSubmit={handleSubmit} className={`grid gap-2 ${className}`}>
-      <label className="text-xs font-semibold text-slate-500" htmlFor="quick-room-search">
+      <label className="text-xs font-normal text-slate-500" htmlFor="quick-room-search">
         빠른 검색
       </label>
-      <div className="flex gap-2">
+      <div className="flex items-stretch gap-2">
         <input
           id="quick-room-search"
-          className="min-h-11 min-w-0 flex-1 rounded-lg px-3"
+          className="min-h-11 min-w-0 flex-1 rounded-lg px-3 leading-none"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder={placeholder}

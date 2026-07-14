@@ -36,7 +36,7 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-surface px-6">
-      <section className="w-full max-w-sm rounded-lg border border-line bg-white p-8 shadow-sm shadow-slate-200/50">
+      <section className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-8 shadow-none">
         <div className="mb-7 text-center">
           <Image
             alt="이건빌"

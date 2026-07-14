@@ -57,16 +57,16 @@ function isActive(pathname: string, href: string) {
 
 function AdminMenu() {
   return (
-    <div className="grid gap-2 rounded-md border border-line bg-slate-50 p-3">
-      <p className="flex items-center gap-2 text-xs font-bold text-slate-500">
-        <ShieldCheck className="h-4 w-4" />
+    <div className="grid gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <p className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+        <ShieldCheck className="h-4 w-4" strokeWidth={2.1} />
         관리자 메뉴
       </p>
       <a className="button-primary flex w-full items-center gap-2" href="/api/backup">
-        <DatabaseBackup className="h-4 w-4" />
+        <DatabaseBackup className="h-4 w-4" strokeWidth={2.1} />
         백업 다운로드
       </a>
-      <RestoreBackupForm icon={<RotateCcw className="h-4 w-4" />} />
+      <RestoreBackupForm icon={<RotateCcw className="h-4 w-4" strokeWidth={2.1} />} />
     </div>
   );
 }
@@ -77,8 +77,8 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-line bg-white md:flex">
-        <div className="border-b border-line px-6 py-5">
+      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-slate-200 bg-white md:flex">
+        <div className="border-b border-slate-200 px-6 py-5">
           <div className="flex items-center gap-3">
             <Image alt="이건빌" height={40} src="/brand/igunbill-app-icon.svg" width={40} />
             <div>
@@ -87,7 +87,7 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
             </div>
           </div>
         </div>
-        <div className="border-b border-line p-3">
+        <div className="border-b border-slate-200 p-3">
           <QuickRoomSearch />
         </div>
         <nav className="flex-1 space-y-1 p-3">
@@ -108,14 +108,14 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
             <AdminMenu />
           </div>
         ) : null}
-        <form action={signOutAction} className="border-t border-line p-3">
-          <button className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
+        <form action={signOutAction} className="border-t border-slate-200 p-3">
+          <button className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 md:hover:bg-slate-50">
             로그아웃
           </button>
         </form>
       </aside>
 
-      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-line bg-white px-4 md:hidden">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden">
         <div className="flex items-center gap-2">
           <Image alt="이건빌" height={32} src="/brand/igunbill-app-icon.svg" width={32} />
           <div>
@@ -123,8 +123,8 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
             <p className="text-[10px] font-bold text-slate-500">임대 수익을 한눈에</p>
           </div>
         </div>
-        <button aria-label="메뉴 열기" className="px-3 py-2" onClick={() => setIsOpen(true)} type="button">
-          <Menu className="h-5 w-5" />
+        <button aria-label="메뉴 열기" className="px-3 py-2 active:scale-[0.98]" onClick={() => setIsOpen(true)} type="button">
+          <Menu className="h-5 w-5" strokeWidth={2.1} />
         </button>
       </header>
 
@@ -136,8 +136,8 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
             onClick={() => setIsOpen(false)}
             type="button"
           />
-          <aside className="absolute inset-y-0 right-0 flex w-[min(86vw,320px)] flex-col border-l border-line bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-line px-4 py-4">
+          <aside className="absolute inset-y-0 right-0 flex w-[min(86vw,320px)] flex-col border-l border-slate-200 bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
               <div className="flex items-center gap-2">
                 <Image alt="이건빌" height={36} src="/brand/igunbill-app-icon.svg" width={36} />
                 <div>
@@ -149,7 +149,7 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
                 닫기
               </button>
             </div>
-            <div className="border-b border-line p-3">
+            <div className="border-b border-slate-200 p-3">
               <QuickRoomSearch />
             </div>
             <nav className="flex-1 space-y-1 p-3">
@@ -164,23 +164,23 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
                     href={menu.href}
                     onClick={() => setIsOpen(false)}
                   >
-                    <Icon className="h-5 w-5" />
+                      <Icon className="h-5 w-5" strokeWidth={2.1} />
                     {menu.label}
                   </Link>
                 );
               })}
             </nav>
             {isAdmin ? (
-              <div className="border-t border-line p-3">
+              <div className="border-t border-slate-200 p-3">
                 <AdminMenu />
               </div>
             ) : null}
-            <div className="border-t border-line p-3">
+            <div className="border-t border-slate-200 p-3">
               <PwaInstallButton />
             </div>
-            <form action={signOutAction} className="border-t border-line p-3">
-              <button className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
-                <LogOut className="h-4 w-4" />
+            <form action={signOutAction} className="border-t border-slate-200 p-3">
+              <button className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 md:hover:bg-slate-50">
+                <LogOut className="h-4 w-4" strokeWidth={2.1} />
                 로그아웃
               </button>
             </form>
@@ -188,16 +188,16 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
         </div>
       ) : null}
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid h-16 grid-cols-5 border-t border-line bg-white md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(64px+env(safe-area-inset-bottom))] grid-cols-5 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
         {bottomMenus.map(({ Icon, ...menu }) => (
           <Link
             key={menu.href}
-            className={`flex min-h-16 flex-col items-center justify-center gap-0.5 text-[11px] font-bold ${
+            className={`flex min-h-16 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition-colors duration-150 active:scale-[0.98] ${
               isActive(pathname, menu.href) ? "text-brand" : "text-slate-400"
             }`}
             href={menu.href}
           >
-            <Icon className="h-[21px] w-[21px]" strokeWidth={2.2} />
+            <Icon className="h-[21px] w-[21px]" strokeWidth={2.1} />
             <span>{menu.label}</span>
           </Link>
         ))}

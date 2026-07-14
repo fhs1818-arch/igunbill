@@ -7,7 +7,7 @@ type AppCardProps = HTMLAttributes<HTMLDivElement> & {
 export function AppCard({ children, className = "", ...props }: AppCardProps) {
   return (
     <div
-      className={`rounded-lg border border-line bg-white p-4 shadow-sm shadow-slate-200/40 md:p-5 ${className}`}
+      className={`rounded-lg border border-slate-200/80 bg-white p-3 shadow-none transition duration-150 active:scale-[0.98] md:p-4 md:hover:border-slate-300 ${className}`}
       {...props}
     >
       {children}

@@ -38,7 +38,7 @@ select,
 textarea {
   font-family: inherit;
   font-weight: 400;
-  @apply rounded-md border border-line bg-white px-2.5 py-2 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-blue-100;
+  @apply min-h-11 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-1 focus:ring-brand;
 }
 
 textarea {
@@ -48,23 +48,23 @@ textarea {
 button,
 .button {
   font-family: inherit;
-  @apply inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50;
+  @apply inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-none transition duration-150 active:scale-[0.98] md:hover:bg-slate-50;
 }
 
 .button-primary {
-  @apply border-brand bg-brand text-white hover:bg-blue-700;
+  @apply inline-flex min-h-11 items-center justify-center rounded-lg border border-brand bg-brand px-3 py-2 text-sm font-semibold text-white shadow-none transition duration-150 active:scale-[0.98] md:hover:bg-blue-700;
 }
 
 .button-danger {
-  @apply border-red-200 bg-red-50 text-red-700 hover:bg-red-100;
+  @apply inline-flex min-h-11 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 shadow-none transition duration-150 active:scale-[0.98] md:hover:bg-red-100;
 }
 
 .panel {
-  @apply border-b border-line bg-white;
+  @apply border-b border-slate-200 bg-white;
 }
 
 .table-wrap {
-  @apply overflow-x-auto border border-line bg-white;
+  @apply overflow-x-auto border border-slate-200 bg-white;
 }
 
 table {

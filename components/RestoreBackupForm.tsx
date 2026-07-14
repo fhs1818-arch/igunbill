@@ -68,7 +68,7 @@ export function RestoreBackupForm({ icon }: RestoreBackupFormProps) {
         {icon}
         {isPending ? "복원 중..." : "백업 복원"}
       </button>
-      {message ? <span className="text-sm font-semibold text-red-700">{message}</span> : null}
+      {message ? <span className="text-sm font-normal text-red-700">{message}</span> : null}
     </div>
   );
 }

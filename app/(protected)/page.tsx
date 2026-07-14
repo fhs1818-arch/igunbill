@@ -289,14 +289,14 @@ export default async function DashboardPage({
         </div>
 
         <AppCard className="p-4 md:p-5">
-          <p className="text-xs font-bold text-slate-500">이번 달 순수익</p>
-          <p className="mt-1 text-4xl font-extrabold tracking-normal text-ink md:text-5xl">
+          <p className="text-4xl font-extrabold tracking-normal text-ink md:text-5xl">
             <MoneyText
               amount={monthlyNetIncome}
               className="text-4xl md:text-5xl"
               tone={monthlyNetIncome >= 0 ? "positive" : "negative"}
             />
           </p>
+          <p className="mt-1 text-xs font-normal text-slate-500">이번 달 순수익</p>
         </AppCard>
 
         <section>
@@ -305,15 +305,15 @@ export default async function DashboardPage({
             {taskCards.map(({ Icon, ...card }) => (
               <Link key={card.label} href={card.href} className="block active:scale-[0.99] md:hover:-translate-y-0.5 md:hover:transition-transform">
                 <AppCard className="h-full p-3 transition md:hover:border-brand">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-slate-600">{card.label}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-[1.65rem] font-bold leading-tight text-ink">
+                      <CountText value={card.value} />
+                    </p>
                     <div className={`rounded-lg p-1.5 ${card.toneClass}`}>
-                      <Icon className="h-5 w-5" />
+                      <Icon className="h-5 w-5" strokeWidth={2.1} />
                     </div>
                   </div>
-                  <p className="mt-2 text-[1.65rem] font-bold leading-tight text-ink">
-                    <CountText value={card.value} />
-                  </p>
+                  <p className="mt-1 text-xs font-normal text-slate-500">{card.label}</p>
                 </AppCard>
               </Link>
             ))}

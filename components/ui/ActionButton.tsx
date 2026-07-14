@@ -16,14 +16,14 @@ type ActionLinkProps = {
 };
 
 const variantClass = {
-  primary: "border-brand bg-brand text-white hover:bg-blue-700",
-  secondary: "border-slate-200 bg-white text-slate-800 hover:bg-slate-50",
-  danger: "border-red-200 bg-red-50 text-red-700 hover:bg-red-100",
-  ghost: "border-transparent bg-transparent text-slate-700 hover:bg-slate-100"
+  primary: "border-brand bg-brand text-white md:hover:bg-blue-700",
+  secondary: "border-slate-200 bg-white text-slate-800 md:hover:bg-slate-50",
+  danger: "border-red-200 bg-red-50 text-red-700 md:hover:bg-red-100",
+  ghost: "border-transparent bg-transparent text-slate-700 md:hover:bg-slate-100"
 };
 
 const baseClass =
-  "inline-flex min-h-10 items-center justify-center rounded-lg border px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex min-h-11 items-center justify-center rounded-lg border px-3 py-2 text-sm font-semibold shadow-none transition duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60";
 
 export function ActionButton({ children, className = "", variant = "secondary", ...props }: ActionButtonProps) {
   return (

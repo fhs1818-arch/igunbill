@@ -31,6 +31,19 @@ enum RepairCategory {
   OTHER
 }
 
+enum UserRole {
+  ADMIN
+  STAFF
+}
+
+model AdminUser {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  role      UserRole @default(STAFF)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Room {
   id          Int           @id @default(autoincrement())
   roomNumber  String        @unique

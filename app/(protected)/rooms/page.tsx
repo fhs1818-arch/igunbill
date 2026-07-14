@@ -22,6 +22,11 @@ const statusOptions: Array<[RoomStatus, string]> = [
   ["MOVE_OUT_SOON", "퇴실예정"]
 ];
 
+const roomGridStyle = {
+  gridTemplateColumns: "90px 120px 150px 140px 110px 100px 90px 140px 140px 170px",
+  minWidth: "1346px"
+};
+
 function roomStatusLabel(status: RoomStatus) {
   return statusOptions.find(([value]) => value === status)?.[1] ?? status;
 }
@@ -105,10 +110,10 @@ export default async function RoomsPage() {
         </details>
 
         <AppCard className="hidden md:block">
-          <form action={createRoom} className="grid grid-cols-5 gap-3 xl:grid-cols-10">
+          <form action={createRoom} className="grid items-end gap-3 overflow-x-auto pb-1" style={roomGridStyle}>
             <RoomCreateFields />
-            <div className="flex items-end">
-              <ActionButton className="w-full" type="submit" variant="primary">등록</ActionButton>
+            <div className="col-start-10 flex items-end">
+              <ActionButton className="h-11 w-full whitespace-nowrap" type="submit" variant="primary">등록</ActionButton>
             </div>
           </form>
         </AppCard>
@@ -174,43 +179,47 @@ export default async function RoomsPage() {
           <table>
             <thead>
               <tr>
-                <th>호실</th>
-                <th>임차인</th>
-                <th>연락처</th>
-                <th>상태</th>
-                <th>보증금</th>
-                <th>월세</th>
-                <th>납부일</th>
-                <th>입실날짜</th>
-                <th>퇴실날짜</th>
-                <th>관리</th>
+                <th colSpan={10} className="p-0">
+                  <div className="grid items-center gap-2 px-3 py-3" style={roomGridStyle}>
+                    <span className="text-center">호실</span>
+                    <span className="text-left">임차인</span>
+                    <span className="text-center">연락처</span>
+                    <span className="text-center">상태</span>
+                    <span className="text-right">보증금</span>
+                    <span className="text-right">월세</span>
+                    <span className="text-center">납부일</span>
+                    <span className="text-center">입실날짜</span>
+                    <span className="text-center">퇴실날짜</span>
+                    <span className="text-center">관리</span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
               {rooms.map((room) => (
                 <tr key={room.id} id={`room-${room.id}`} className="transition-colors hover:bg-slate-50">
                   <td colSpan={10} className="p-0">
-                    <form action={updateRoom} className="grid grid-cols-[85px_120px_140px_125px_110px_100px_85px_130px_130px_150px] gap-2 px-3 py-3">
+                    <form action={updateRoom} className="grid items-center gap-2 px-3 py-3" style={roomGridStyle}>
                       <input type="hidden" name="id" value={room.id} />
-                      <input name="roomNumber" defaultValue={room.roomNumber} required />
-                      <input name="tenantName" defaultValue={room.tenantName ?? ""} />
-                      <input name="tenantPhone" defaultValue={room.tenantPhone ?? ""} />
-                      <div className="grid gap-1">
-                        <StatusBadge className="justify-center" tone={roomStatusTone(room.status)}>
+                      <input className="text-center" name="roomNumber" defaultValue={room.roomNumber} required />
+                      <input className="text-left" name="tenantName" defaultValue={room.tenantName ?? ""} />
+                      <input className="text-center" name="tenantPhone" defaultValue={room.tenantPhone ?? ""} />
+                      <div className="flex h-11 items-center gap-2">
+                        <StatusBadge className="shrink-0 justify-center" tone={roomStatusTone(room.status)}>
                           {roomStatusLabel(room.status)}
                         </StatusBadge>
-                        <select name="status" defaultValue={room.status}>
+                        <select className="min-w-0 flex-1" name="status" defaultValue={room.status}>
                           {statusOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                         </select>
                       </div>
-                      <input name="deposit" type="number" defaultValue={room.deposit} aria-label={`보증금 ${won(room.deposit)}`} />
-                      <input name="monthlyRent" type="number" defaultValue={room.monthlyRent} />
-                      <input name="rentDueDay" type="number" min={1} max={31} defaultValue={room.rentDueDay} />
-                      <input name="moveInDate" type="date" defaultValue={dateInput(room.moveInDate)} />
-                      <input name="moveOutDate" type="date" defaultValue={dateInput(room.moveOutDate)} />
-                      <div className="flex gap-2">
-                        <ActionButton className="flex-1" type="submit">수정</ActionButton>
-                        {isAdmin ? <ActionButton className="flex-1" formAction={deleteRoom} variant="danger">삭제</ActionButton> : null}
+                      <input className="text-right" name="deposit" type="number" defaultValue={room.deposit} aria-label={`보증금 ${won(room.deposit)}`} />
+                      <input className="text-right" name="monthlyRent" type="number" defaultValue={room.monthlyRent} />
+                      <input className="text-center" name="rentDueDay" type="number" min={1} max={31} defaultValue={room.rentDueDay} />
+                      <input className="text-center" name="moveInDate" type="date" defaultValue={dateInput(room.moveInDate)} />
+                      <input className="text-center" name="moveOutDate" type="date" defaultValue={dateInput(room.moveOutDate)} />
+                      <div className="flex items-center justify-center gap-2">
+                        <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" type="submit">수정</ActionButton>
+                        {isAdmin ? <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" formAction={deleteRoom} variant="danger">삭제</ActionButton> : null}
                       </div>
                     </form>
                   </td>

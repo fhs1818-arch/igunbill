@@ -59,7 +59,6 @@ export default async function MovePage() {
         <div className="grid gap-3 md:hidden">
           {rooms.map((room) => {
             const notice = contractNotice(room.moveOutDate);
-            const status = moveStatus(room);
             return (
               <form key={room.id} action={updateMoveOutDate}>
                 <input type="hidden" name="roomId" value={room.id} />
@@ -70,7 +69,6 @@ export default async function MovePage() {
                       <p className="text-2xl font-bold text-ink">{room.roomNumber}</p>
                       <p className="mt-1 truncate text-sm font-semibold text-slate-600">{room.tenantName ?? "-"}</p>
                     </div>
-                    <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 gap-3">
@@ -145,7 +143,6 @@ export default async function MovePage() {
                   <th>호실</th>
                   <th>임차인</th>
                   <th>연락처</th>
-                  <th>퇴실상태</th>
                   <th>현재상태</th>
                   <th>보증금</th>
                   <th>월세</th>
@@ -159,22 +156,18 @@ export default async function MovePage() {
               <tbody>
                 {rooms.map((room) => {
                   const notice = contractNotice(room.moveOutDate);
-                  const status = moveStatus(room);
                   return (
                     <tr key={room.id} className="transition-colors hover:bg-slate-50">
-                      <td colSpan={12} className="p-0">
+                      <td colSpan={11} className="p-0">
                         <form
                           action={updateMoveOutDate}
-                          className="grid grid-cols-[80px_120px_140px_105px_105px_115px_105px_130px_130px_100px_150px_170px] gap-2 px-3 py-3"
+                          className="grid grid-cols-[80px_120px_140px_105px_115px_105px_130px_130px_100px_150px_170px] gap-2 px-3 py-3"
                         >
                           <input type="hidden" name="roomId" value={room.id} />
                           <input type="hidden" name="memo" value={room.memo ?? ""} />
                           <div className="py-2 font-bold text-ink">{room.roomNumber}</div>
                           <div className="py-2 text-slate-700">{room.tenantName ?? "-"}</div>
                           <div className="py-2 text-slate-700">{room.tenantPhone ?? "-"}</div>
-                          <div className="py-1.5">
-                            <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
-                          </div>
                           <div className="py-1.5">
                             <StatusBadge tone={room.status === "VACANT" ? "default" : room.status === "MOVE_OUT_SOON" ? "warning" : "positive"}>
                               {roomStatusLabel(room.status)}
@@ -215,7 +208,7 @@ export default async function MovePage() {
                 })}
                 {rooms.length === 0 ? (
                   <tr>
-                    <td colSpan={12} className="py-8">
+                    <td colSpan={11} className="py-8">
                       <EmptyState title="등록된 퇴실 내역이 없습니다." />
                     </td>
                   </tr>

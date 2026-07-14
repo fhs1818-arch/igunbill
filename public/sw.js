@@ -1,4 +1,4 @@
-const CACHE_VERSION = "igunbill-pwa-v1.7.0";
+const CACHE_VERSION = "igunbill-pwa-v1.8.4";
 const STATIC_CACHE = CACHE_VERSION;
 const PRECACHE_URLS = [
   "/offline",
@@ -6,7 +6,8 @@ const PRECACHE_URLS = [
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/maskable-192.png",
-  "/icons/maskable-512.png"
+  "/icons/maskable-512.png",
+  "/fonts/PretendardVariable.woff2"
 ];
 
 self.addEventListener("install", (event) => {
@@ -30,6 +31,7 @@ function isAllowedStaticRequest(url, request) {
   if (url.pathname === "/offline") return true;
   if (url.pathname === "/manifest.webmanifest") return true;
   if (url.pathname.startsWith("/icons/")) return true;
+  if (url.pathname.startsWith("/fonts/")) return true;
   if (url.pathname.startsWith("/_next/static/")) return true;
   return false;
 }

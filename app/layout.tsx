@@ -1,7 +1,15 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import { PwaSplashScreen } from "@/components/PwaSplashScreen";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import "./globals.css";
+
+const pretendard = localFont({
+  src: "../public/fonts/PretendardVariable.woff2",
+  display: "swap",
+  variable: "--font-pretendard",
+  weight: "45 920"
+});
 
 export const metadata: Metadata = {
   title: "이건빌",
@@ -29,8 +37,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
-      <body>
+    <html lang="ko" className={pretendard.variable}>
+      <body className={pretendard.className}>
         <ServiceWorkerRegister />
         <PwaSplashScreen />
         {children}

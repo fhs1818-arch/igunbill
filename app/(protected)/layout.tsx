@@ -34,7 +34,9 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   }
 
   const isAdmin = adminUser.role === "ADMIN";
-  const menus = isAdmin ? [...baseMenus, { href: "/audit-logs", label: "활동 로그" }] : baseMenus;
+  const menus = isAdmin
+    ? [...baseMenus, { href: "/tax", label: "세무" }, { href: "/audit-logs", label: "활동 로그" }]
+    : baseMenus;
 
   return (
     <AdminRoleProvider role={adminUser.role}>

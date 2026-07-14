@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function QuickRoomSearch() {
+export function QuickRoomSearch({
+  className = "",
+  placeholder = "호실 / 세입자 / 연락처 검색"
+}: {
+  className?: string;
+  placeholder?: string;
+}) {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
@@ -15,20 +21,20 @@ export function QuickRoomSearch() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-2">
+    <form onSubmit={handleSubmit} className={`grid gap-2 ${className}`}>
       <label className="text-xs font-semibold text-slate-500" htmlFor="quick-room-search">
         빠른 검색
       </label>
       <div className="flex gap-2">
         <input
           id="quick-room-search"
-          className="min-w-0 flex-1"
+          className="min-h-11 min-w-0 flex-1 rounded-lg px-3"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="호실, 세입자, 전화번호"
+          placeholder={placeholder}
           type="search"
         />
-        <button className="shrink-0" type="submit">
+        <button className="button-primary min-h-11 shrink-0 rounded-lg px-4" type="submit">
           검색
         </button>
       </div>

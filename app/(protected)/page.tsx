@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AlertTriangle, CalendarClock, CircleDollarSign, Wrench } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { ActionLink } from "@/components/ui/ActionButton";
 import { AppCard } from "@/components/ui/AppCard";
@@ -45,6 +46,8 @@ function sumAmounts<T>(items: T[], pick: (item: T) => number) {
 function koreaDateParts(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     day: "2-digit",
+    hour: "2-digit",
+    hourCycle: "h23",
     month: "2-digit",
     timeZone: "Asia/Seoul",
     year: "numeric"
@@ -54,10 +57,23 @@ function koreaDateParts(date = new Date()) {
 
   return {
     day: Number(partMap.day),
+    hour: Number(partMap.hour ?? 0),
     month: partMap.month,
     monthKey: `${partMap.year}-${partMap.month}`,
     year: partMap.year
   };
+}
+
+function addDaysToDateString(value: string, days: number) {
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day + days);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function greetingForHour(hour: number) {
+  if (hour < 12) return "좋은 아침입니다. 오늘도 건물 관리를 시작해볼까요?";
+  if (hour < 18) return "좋은 오후입니다. 오늘의 임대 현황을 확인해볼까요?";
+  return "좋은 저녁입니다. 오늘 마무리할 관리를 확인해볼까요?";
 }
 
 function formatKoreanDate(value: Date) {
@@ -98,7 +114,9 @@ export default async function DashboardPage({
     dueTodayCount,
     currentMonthOverdueCount,
     selectedMonthMoveOutSoonCount,
-    vacantRoomCount
+    vacantRoomCount,
+    sevenDayMoveOutSoonCount,
+    unpaidRepairCount
   ] = await Promise.all([
     getCurrentAdminUser(),
     prisma.room.aggregate({
@@ -162,6 +180,20 @@ export default async function DashboardPage({
       where: {
         status: "VACANT"
       }
+    }),
+    prisma.room.count({
+      where: {
+        status: "MOVE_OUT_SOON",
+        moveOutDate: {
+          gte: `${todayKorea.year}-${todayKorea.month}-${String(todayKorea.day).padStart(2, "0")}`,
+          lte: addDaysToDateString(`${todayKorea.year}-${todayKorea.month}-${String(todayKorea.day).padStart(2, "0")}`, 7)
+        }
+      }
+    }),
+    prisma.repair.count({
+      where: {
+        isPaid: false
+      }
     })
   ]);
 
@@ -214,29 +246,76 @@ export default async function DashboardPage({
 
   const prevMonth = addMonths(selectedMonth, -1);
   const nextMonth = addMonths(selectedMonth, 1);
-  const todoCount = dueTodayCount + currentMonthOverdueCount + selectedMonthMoveOutSoonCount;
+  const todoCount = dueTodayCount + currentMonthOverdueCount + sevenDayMoveOutSoonCount + unpaidRepairCount;
   const alertCards = [
     {
       href: "/payments",
-      label: "입금예정",
+      Icon: CircleDollarSign,
+      label: "오늘 입금예정",
       note: "오늘 기준",
       tone: "brand" as const,
       value: dueTodayCount
     },
     {
       href: "/payments",
-      label: "미납",
+      Icon: AlertTriangle,
+      label: "현재 미납",
       note: "현재 월 기준",
       tone: "negative" as const,
       value: currentMonthOverdueCount
     },
     {
       href: "/move",
-      label: "퇴실예정",
-      note: "선택월 기준",
+      Icon: CalendarClock,
+      label: "7일 이내 퇴실예정",
+      note: "오늘부터 7일",
       tone: "warning" as const,
-      value: selectedMonthMoveOutSoonCount
+      value: sevenDayMoveOutSoonCount
     },
+    {
+      href: "/repairs",
+      Icon: Wrench,
+      label: "미결제 수리",
+      note: "현재 상태",
+      tone: "warning" as const,
+      value: unpaidRepairCount
+    }
+  ];
+  const urgentAlerts = [
+    {
+      href: "/payments",
+      Icon: AlertTriangle,
+      label: "미납",
+      message: `현재 월 미납 ${currentMonthOverdueCount}건을 확인해 주세요.`,
+      tone: "negative" as const,
+      value: currentMonthOverdueCount
+    },
+    {
+      href: "/move",
+      Icon: CalendarClock,
+      label: "퇴실예정",
+      message: `7일 이내 퇴실예정 ${sevenDayMoveOutSoonCount}건이 있습니다.`,
+      tone: "warning" as const,
+      value: sevenDayMoveOutSoonCount
+    },
+    {
+      href: "/repairs",
+      Icon: Wrench,
+      label: "미결제 수리",
+      message: `미결제 수리 ${unpaidRepairCount}건을 확인해 주세요.`,
+      tone: "warning" as const,
+      value: unpaidRepairCount
+    },
+    {
+      href: "/payments",
+      Icon: CircleDollarSign,
+      label: "입금예정",
+      message: `오늘 입금예정 ${dueTodayCount}건이 있습니다.`,
+      tone: "brand" as const,
+      value: dueTodayCount
+    }
+  ].filter((alert) => alert.value > 0);
+  const statusSummaryCards = [
     {
       href: "/rooms",
       label: "공실",
@@ -282,6 +361,53 @@ export default async function DashboardPage({
           </div>
         </div>
 
+        <AppCard className="p-4 md:p-5">
+          <p className="text-sm font-bold text-brand">이건빌</p>
+          <h2 className="mt-1 text-2xl font-extrabold leading-snug text-ink md:text-3xl">
+            {greetingForHour(todayKorea.hour)}
+          </h2>
+          <p className="mt-2 text-sm font-semibold text-slate-500">오늘 해야 할 일 {todoCount}건을 먼저 확인하세요.</p>
+        </AppCard>
+
+        <Section title="오늘 해야 할 일" description="현재 데이터 기준으로 계산한 실시간 알림입니다." className="p-4">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {alertCards.map(({ Icon, ...card }) => (
+              <Link key={card.label} href={card.href} className="block active:scale-[0.99] md:hover:-translate-y-0.5 md:hover:transition-transform">
+                <AppCard className="h-full p-4 transition md:hover:border-brand">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className={`rounded-lg p-2 ${
+                      card.tone === "negative" ? "bg-red-50 text-red-700" : card.tone === "warning" ? "bg-amber-50 text-amber-700" : "bg-blue-50 text-brand"
+                    }`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <StatusBadge tone={card.tone}>{card.note}</StatusBadge>
+                  </div>
+                  <p className="mt-3 text-sm font-bold text-slate-600">{card.label}</p>
+                  <p className="mt-1 text-3xl font-extrabold text-ink">{card.value}건</p>
+                </AppCard>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
+            {urgentAlerts.length > 0 ? (
+              urgentAlerts.map(({ Icon, ...alert }) => (
+                <Link key={alert.label} href={alert.href} className="block active:scale-[0.99] md:hover:transition-opacity md:hover:opacity-90">
+                  <div className="flex items-center gap-3 rounded-lg border border-line bg-slate-50 p-3">
+                    <StatusBadge tone={alert.tone} className="shrink-0">
+                      <Icon className="mr-1 h-3.5 w-3.5" />
+                      {alert.label}
+                    </StatusBadge>
+                    <p className="text-sm font-semibold text-slate-700">{alert.message}</p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <EmptyState title="오늘 처리할 긴급한 일이 없습니다." />
+            )}
+          </div>
+        </Section>
+
         <AppCard className="overflow-hidden p-4 md:p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
@@ -318,11 +444,11 @@ export default async function DashboardPage({
           />
         </div>
 
-        <Section title="오늘 할 일" description="매일 확인해야 하는 핵심 알림입니다." className="p-4">
+        <Section title="기타 현황" description="현재 상태 기준으로 참고할 항목입니다." className="p-4">
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            {alertCards.map((card) => (
+            {statusSummaryCards.map((card) => (
               <Link key={card.label} href={card.href}>
-                <AppCard className="h-full p-3 transition hover:border-brand">
+                <AppCard className="h-full p-3 transition active:scale-[0.99] md:hover:border-brand">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-sm font-bold text-slate-600">{card.label}</p>
                     <StatusBadge tone={card.tone}>{card.note}</StatusBadge>

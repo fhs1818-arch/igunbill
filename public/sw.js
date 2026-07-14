@@ -1,4 +1,4 @@
-const CACHE_VERSION = "igunbill-pwa-v1.3.0";
+const CACHE_VERSION = "igunbill-pwa-v1.7.0";
 const STATIC_CACHE = CACHE_VERSION;
 const PRECACHE_URLS = [
   "/offline",

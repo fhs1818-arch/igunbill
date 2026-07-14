@@ -4,11 +4,11 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "이건빌",
     short_name: "이건빌",
-    description: "이건빌 임대관리",
+    description: "임대 수익을 한눈에",
     start_url: "/",
     scope: "/",
     display: "standalone",
-    theme_color: "#1f6feb",
+    theme_color: "#2563EB",
     background_color: "#f7f8fa",
     icons: [
       {

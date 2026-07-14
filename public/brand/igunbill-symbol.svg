@@ -1,0 +1,11 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="이건빌 심볼">
+  <rect width="256" height="256" rx="56" fill="#FFFFFF"/>
+  <path d="M66 184V82C66 68.7452 76.7452 58 90 58H166C179.255 58 190 68.7452 190 82V184" stroke="#2563EB" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M94 184V133C94 124.163 101.163 117 110 117H146C154.837 117 162 124.163 162 133V184" fill="#DBEAFE"/>
+  <path d="M100 94H112" stroke="#2563EB" stroke-width="13" stroke-linecap="round"/>
+  <path d="M124 94H132" stroke="#2563EB" stroke-width="13" stroke-linecap="round"/>
+  <path d="M148 94H160" stroke="#2563EB" stroke-width="13" stroke-linecap="round"/>
+  <path d="M59 188H197" stroke="#111827" stroke-width="18" stroke-linecap="round"/>
+  <path d="M88 154L118 130L143 144L180 107" stroke="#2DD4BF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M160 107H180V127" stroke="#2DD4BF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

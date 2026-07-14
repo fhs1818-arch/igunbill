@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import { PwaSplashScreen } from "@/components/PwaSplashScreen";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "이건빌",
-  description: "이건빌 임대관리",
+  description: "임대 수익을 한눈에",
   applicationName: "이건빌",
   appleWebApp: {
     capable: true,
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1f6feb",
+  themeColor: "#2563EB",
   colorScheme: "light"
 };
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body>
         <ServiceWorkerRegister />
+        <PwaSplashScreen />
         {children}
       </body>
     </html>

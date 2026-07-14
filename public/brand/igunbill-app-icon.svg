@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="이건빌 앱 아이콘">
+  <rect width="512" height="512" rx="112" fill="#2563EB"/>
+  <path d="M124 378V156C124 130.595 144.595 110 170 110H342C367.405 110 388 130.595 388 156V378" stroke="#FFFFFF" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M184 378V266C184 249.431 197.431 236 214 236H298C314.569 236 328 249.431 328 266V378" fill="#DBEAFE"/>
+  <path d="M196 184H220" stroke="#FFFFFF" stroke-width="31" stroke-linecap="round"/>
+  <path d="M244 184H268" stroke="#FFFFFF" stroke-width="31" stroke-linecap="round"/>
+  <path d="M292 184H316" stroke="#FFFFFF" stroke-width="31" stroke-linecap="round"/>
+  <path d="M100 388H412" stroke="#FFFFFF" stroke-width="42" stroke-linecap="round"/>
+  <path d="M170 318L236 265L291 296L382 205" stroke="#2DD4BF" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M336 205H382V251" stroke="#2DD4BF" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

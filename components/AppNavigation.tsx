@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { RestoreBackupForm } from "@/components/RestoreBackupForm";
@@ -50,8 +51,13 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
     <>
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-line bg-white md:flex">
         <div className="border-b border-line px-6 py-5">
-          <p className="text-xs font-semibold text-slate-500">RENTAL MANAGER</p>
-          <h1 className="mt-1 text-xl font-bold text-ink">이건빌</h1>
+          <div className="flex items-center gap-3">
+            <Image alt="이건빌" height={40} src="/brand/igunbill-app-icon.svg" width={40} />
+            <div>
+              <h1 className="text-xl font-bold text-ink">이건빌</h1>
+              <p className="mt-0.5 text-xs font-bold text-slate-500">임대 수익을 한눈에</p>
+            </div>
+          </div>
         </div>
         <div className="border-b border-line p-3">
           <QuickRoomSearch />
@@ -82,9 +88,12 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
       </aside>
 
       <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center justify-between border-b border-line bg-white px-4 md:hidden">
-        <div>
-          <p className="text-[10px] font-semibold text-slate-500">RENTAL MANAGER</p>
-          <h1 className="text-lg font-bold text-ink">이건빌</h1>
+        <div className="flex items-center gap-2">
+          <Image alt="이건빌" height={32} src="/brand/igunbill-app-icon.svg" width={32} />
+          <div>
+            <h1 className="text-lg font-bold leading-5 text-ink">이건빌</h1>
+            <p className="text-[10px] font-bold text-slate-500">임대 수익을 한눈에</p>
+          </div>
         </div>
         <button aria-label="메뉴 열기" className="px-3 py-2" onClick={() => setIsOpen(true)} type="button">
           메뉴
@@ -101,9 +110,12 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
           />
           <aside className="absolute inset-y-0 right-0 flex w-[min(86vw,320px)] flex-col border-l border-line bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-line px-4 py-4">
-              <div>
-                <p className="text-xs font-semibold text-slate-500">MENU</p>
-                <h2 className="text-lg font-bold text-ink">이건빌</h2>
+              <div className="flex items-center gap-2">
+                <Image alt="이건빌" height={36} src="/brand/igunbill-app-icon.svg" width={36} />
+                <div>
+                  <h2 className="text-lg font-bold text-ink">이건빌</h2>
+                  <p className="text-xs font-bold text-slate-500">임대 수익을 한눈에</p>
+                </div>
               </div>
               <button aria-label="메뉴 닫기" onClick={() => setIsOpen(false)} type="button">
                 닫기

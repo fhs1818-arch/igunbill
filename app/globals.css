@@ -71,3 +71,22 @@ tr:last-child td {
 .room-search-highlight td {
   background: #fef3c7;
 }
+
+@keyframes igunbill-splash-fade {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.pwa-splash {
+  animation: igunbill-splash-fade 1.4s ease forwards;
+}

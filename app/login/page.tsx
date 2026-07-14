@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -35,10 +36,18 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-surface px-6">
-      <section className="w-full max-w-sm border border-line bg-white p-8">
-        <div className="mb-6">
-          <p className="text-xs font-semibold text-slate-500">RENTAL MANAGER</p>
-          <h1 className="mt-1 text-2xl font-bold text-ink">이건빌 관리자 로그인</h1>
+      <section className="w-full max-w-sm rounded-lg border border-line bg-white p-8 shadow-sm shadow-slate-200/50">
+        <div className="mb-7 text-center">
+          <Image
+            alt="이건빌"
+            className="mx-auto"
+            height={96}
+            priority
+            src="/brand/igunbill-app-icon.svg"
+            width={96}
+          />
+          <h1 className="mt-4 text-3xl font-extrabold text-ink">이건빌</h1>
+          <p className="mt-2 text-base font-bold text-slate-600">임대 수익을 한눈에</p>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>

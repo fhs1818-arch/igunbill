@@ -2,6 +2,7 @@ import { RoomStatus } from "@prisma/client";
 import { createRoom, deleteRoom, updateRoom } from "@/app/actions";
 import { Field } from "@/components/Field";
 import { PageHeader } from "@/components/PageHeader";
+import { RoomHashHighlighter } from "@/components/RoomHashHighlighter";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
 import { dateInput, roomStatusLabel, won } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -23,6 +24,7 @@ export default async function RoomsPage() {
 
   return (
     <>
+      <RoomHashHighlighter />
       <PageHeader title="호실관리" description="호실관리 데이터가 월세입금관리의 원본입니다." />
       <section className="p-8">
         <form action={createRoom} className="mb-6 grid grid-cols-10 gap-3 border border-line bg-white p-4">
@@ -63,7 +65,7 @@ export default async function RoomsPage() {
             </thead>
             <tbody>
               {rooms.map((room) => (
-                <tr key={room.id}>
+                <tr key={room.id} id={`room-${room.id}`} className="transition-colors">
                   <td colSpan={10} className="p-0">
                     <form action={updateRoom} className="grid grid-cols-[85px_120px_140px_105px_110px_100px_85px_130px_130px_135px] gap-2 px-3 py-2">
                       <input type="hidden" name="id" value={room.id} />

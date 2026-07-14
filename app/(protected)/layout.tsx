@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signOut } from "@/app/auth/actions";
 import { AdminRoleProvider } from "@/components/AdminRoleProvider";
+import { QuickRoomSearch } from "@/components/QuickRoomSearch";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -39,11 +40,14 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 
   return (
     <AdminRoleProvider role={adminUser.role}>
-      <div className="flex min-h-screen bg-surface">
-        <aside className="fixed inset-y-0 left-0 flex w-64 flex-col border-r border-line bg-white">
+      <div className="flex min-h-screen flex-col bg-surface lg:flex-row">
+        <aside className="flex w-full flex-col border-b border-line bg-white lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:border-b-0 lg:border-r">
           <div className="border-b border-line px-6 py-5">
             <p className="text-xs font-semibold text-slate-500">RENTAL MANAGER</p>
             <h1 className="mt-1 text-xl font-bold text-ink">이건빌</h1>
+          </div>
+          <div className="border-b border-line p-3">
+            <QuickRoomSearch />
           </div>
           <nav className="flex-1 space-y-1 p-3">
             {menus.map((menu) => (
@@ -62,7 +66,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
             </button>
           </form>
         </aside>
-        <main className="ml-64 flex-1">{children}</main>
+        <main className="flex-1 lg:ml-64">{children}</main>
       </div>
     </AdminRoleProvider>
   );

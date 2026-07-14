@@ -115,15 +115,19 @@ export default async function MovePage() {
             <table>
               <thead>
                 <tr>
-                  <th className="text-center">호실</th>
-                  <th className="text-left">임차인</th>
-                  <th className="text-center">연락처</th>
-                  <th className="text-right">보증금</th>
-                  <th className="text-right">월세</th>
-                  <th className="text-center">입실날짜</th>
-                  <th className="text-center">퇴실날짜</th>
-                  <th className="text-center">남은일수</th>
-                  <th className="text-center">관리</th>
+                  <th colSpan={9} className="p-0">
+                    <div className="grid grid-cols-[70px_minmax(90px,1fr)_140px_110px_90px_120px_150px_90px_180px] items-center gap-2 px-3 py-3">
+                      <span className="text-center">호실</span>
+                      <span className="text-left">임차인</span>
+                      <span className="text-center">연락처</span>
+                      <span className="text-right">보증금</span>
+                      <span className="text-right">월세</span>
+                      <span className="text-center">입실날짜</span>
+                      <span className="text-center">퇴실날짜</span>
+                      <span className="text-center">남은일수</span>
+                      <span className="text-center">관리</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -134,7 +138,7 @@ export default async function MovePage() {
                       <td colSpan={9} className="p-0">
                         <form
                           action={updateMoveOutDate}
-                          className="grid grid-cols-[72px_120px_140px_115px_105px_120px_120px_90px_170px] gap-2 px-3 py-3"
+                          className="grid grid-cols-[70px_minmax(90px,1fr)_140px_110px_90px_120px_150px_90px_180px] items-center gap-2 px-3 py-3"
                         >
                           <input type="hidden" name="roomId" value={room.id} />
                           <input type="hidden" name="memo" value={room.memo ?? ""} />
@@ -148,7 +152,12 @@ export default async function MovePage() {
                             <MoneyText amount={room.monthlyRent} />
                           </div>
                           <div className="py-2 text-center text-slate-700">{dateInput(room.moveInDate) || "-"}</div>
-                          <input name="moveOutDate" type="date" defaultValue={dateInput(room.moveOutDate)} />
+                          <input
+                            className="mx-auto h-11 w-[136px] text-center"
+                            name="moveOutDate"
+                            type="date"
+                            defaultValue={dateInput(room.moveOutDate)}
+                          />
                           <div
                             className={
                               notice.daysLeft !== null && notice.daysLeft <= 60
@@ -159,15 +168,15 @@ export default async function MovePage() {
                             {notice.daysLeft === null ? "-" : `${notice.daysLeft}일`}
                           </div>
                           <div className="flex items-center justify-center gap-2">
-                            <ActionButton className="h-11 flex-1" type="submit">
+                            <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" type="submit">
                               수정
                             </ActionButton>
                             {room.status === "VACANT" ? (
-                              <div className="flex h-11 flex-1 items-center justify-center rounded-lg bg-slate-50 px-3 py-2 text-sm font-bold text-slate-400">
+                              <div className="flex h-11 min-w-0 flex-1 items-center justify-center rounded-lg bg-slate-50 px-3 py-2 text-sm font-bold text-slate-400">
                                 완료
                               </div>
                             ) : (
-                              <ActionButton className="h-11 flex-1" formAction={moveOut} variant="danger">
+                              <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" formAction={moveOut} variant="danger">
                                 퇴실완료
                               </ActionButton>
                             )}

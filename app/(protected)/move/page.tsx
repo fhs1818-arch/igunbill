@@ -116,7 +116,7 @@ export default async function MovePage() {
               <thead>
                 <tr>
                   <th colSpan={9} className="p-0">
-                    <div className="grid grid-cols-[70px_minmax(90px,1fr)_140px_110px_90px_120px_150px_90px_180px] items-center gap-2 px-3 py-3">
+                    <div className="grid grid-cols-[80px_140px_150px_110px_90px_120px_160px_90px_180px] items-center gap-2 px-3 py-3">
                       <span className="text-center">호실</span>
                       <span className="text-left">임차인</span>
                       <span className="text-center">연락처</span>
@@ -138,7 +138,7 @@ export default async function MovePage() {
                       <td colSpan={9} className="p-0">
                         <form
                           action={updateMoveOutDate}
-                          className="grid grid-cols-[70px_minmax(90px,1fr)_140px_110px_90px_120px_150px_90px_180px] items-center gap-2 px-3 py-3"
+                          className="grid grid-cols-[80px_140px_150px_110px_90px_120px_160px_90px_180px] items-center gap-2 px-3 py-3"
                         >
                           <input type="hidden" name="roomId" value={room.id} />
                           <input type="hidden" name="memo" value={room.memo ?? ""} />

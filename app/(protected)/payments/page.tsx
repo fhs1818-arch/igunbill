@@ -34,8 +34,8 @@ function paymentStatusTone(status: string) {
 }
 
 const paymentGridStyle = {
-  gridTemplateColumns: "90px 160px 130px 150px 135px minmax(160px, 1fr) 210px",
-  minWidth: "1055px"
+  gridTemplateColumns: "80px 140px 100px 150px 120px minmax(240px, 1fr) 220px",
+  minWidth: "1090px"
 };
 
 export default async function PaymentsPage({
@@ -164,13 +164,18 @@ export default async function PaymentsPage({
                         <div className="py-2 text-right">
                           <MoneyText amount={payment.monthlyRent} />
                         </div>
-                        <input className="mx-auto text-center" name="paidDate" type="date" defaultValue={dateInput(payment.paidDate)} />
+                        <input
+                          className="mx-auto w-[136px] text-center"
+                          name="paidDate"
+                          type="date"
+                          defaultValue={dateInput(payment.paidDate)}
+                        />
                         <div className="flex items-center justify-center">
                           <StatusBadge tone={paymentStatusTone(payment.status)}>
                             {paymentStatusLabel(payment.status)}
                           </StatusBadge>
                         </div>
-                        <input name="memo" defaultValue={payment.memo ?? ""} />
+                        <input className="w-full min-w-0" name="memo" defaultValue={payment.memo ?? ""} />
                         <div className="flex items-center justify-center gap-2">
                           <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" type="submit">수정</ActionButton>
                           <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" formAction={markPaymentPaid} variant="primary">입금처리</ActionButton>

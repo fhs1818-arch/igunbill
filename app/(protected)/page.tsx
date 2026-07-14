@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { RestoreBackupForm } from "@/components/RestoreBackupForm";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
 import { addMonths, monthKey, monthLabel, won } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -38,10 +39,13 @@ function sumAmounts<T>(items: T[], pick: (item: T) => number) {
 export default async function DashboardPage({
   searchParams
 }: {
-  searchParams: Promise<{ month?: string | string[] }>;
+  searchParams: Promise<{ month?: string | string[]; restore?: string | string[] }>;
 }) {
   const resolvedSearchParams = await searchParams;
   const selectedMonth = selectedMonthFrom(resolvedSearchParams);
+  const restoreStatus = Array.isArray(resolvedSearchParams.restore)
+    ? resolvedSearchParams.restore[0]
+    : resolvedSearchParams.restore;
   const selectedYear = Number(selectedMonth.slice(0, 4));
   const selectedMonthRange = monthDateRange(selectedMonth);
   const cumulativeMonths = yearMonthRange(selectedMonth);
@@ -161,13 +165,22 @@ export default async function DashboardPage({
         description={`${monthLabel(selectedMonth)} 기준 이건빌 현황`}
         actions={
           isAdmin ? (
-            <a className="button-primary" href="/api/backup">
-              백업 다운로드
-            </a>
+            <div className="flex items-center gap-2">
+              <a className="button-primary" href="/api/backup">
+                백업 다운로드
+              </a>
+              <RestoreBackupForm />
+            </div>
           ) : null
         }
       />
       <section className="p-8">
+        {restoreStatus === "success" ? (
+          <div className="mb-4 border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+            백업 복원이 완료되었습니다.
+          </div>
+        ) : null}
+
         <div className="mb-4 flex items-center justify-between border border-line bg-white px-4 py-3">
           <Link className="button" href={`/?month=${prevMonth}`}>
             이전달

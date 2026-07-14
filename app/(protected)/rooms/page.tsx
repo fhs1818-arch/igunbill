@@ -2,6 +2,7 @@ import { RoomStatus } from "@prisma/client";
 import { createRoom, deleteRoom, updateRoom } from "@/app/actions";
 import { Field } from "@/components/Field";
 import { PageHeader } from "@/components/PageHeader";
+import { getCurrentAdminUser } from "@/lib/admin-auth";
 import { dateInput, roomStatusLabel, won } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -14,7 +15,11 @@ const statusOptions: Array<[RoomStatus, string]> = [
 ];
 
 export default async function RoomsPage() {
-  const rooms = await prisma.room.findMany({ orderBy: { roomNumber: "asc" } });
+  const [adminUser, rooms] = await Promise.all([
+    getCurrentAdminUser(),
+    prisma.room.findMany({ orderBy: { roomNumber: "asc" } })
+  ]);
+  const isAdmin = adminUser?.role === "ADMIN";
 
   return (
     <>
@@ -75,7 +80,9 @@ export default async function RoomsPage() {
                       <input name="moveOutDate" type="date" defaultValue={dateInput(room.moveOutDate)} />
                       <div className="flex gap-2">
                         <button className="flex-1" type="submit">수정</button>
-                        <button className="button-danger flex-1" formAction={deleteRoom}>삭제</button>
+                        {isAdmin ? (
+                          <button className="button-danger flex-1" formAction={deleteRoom}>삭제</button>
+                        ) : null}
                       </div>
                     </form>
                   </td>

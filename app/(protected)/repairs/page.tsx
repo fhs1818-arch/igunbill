@@ -1,6 +1,7 @@
 import { createRepair, deleteRepair, updateRepair } from "@/app/actions";
 import { Field } from "@/components/Field";
 import { PageHeader } from "@/components/PageHeader";
+import { getCurrentAdminUser } from "@/lib/admin-auth";
 import { dateInput, won } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -19,10 +20,12 @@ const categoryOptions = [
 ];
 
 export default async function RepairsPage() {
-  const [rooms, repairs] = await Promise.all([
+  const [adminUser, rooms, repairs] = await Promise.all([
+    getCurrentAdminUser(),
     prisma.room.findMany({ orderBy: { roomNumber: "asc" } }),
     prisma.repair.findMany({ include: { room: true }, orderBy: { date: "desc" } })
   ]);
+  const isAdmin = adminUser?.role === "ADMIN";
 
   return (
     <>
@@ -99,7 +102,9 @@ export default async function RepairsPage() {
                       <input name="memo" defaultValue={repair.memo ?? ""} />
                       <div className="flex gap-2">
                         <button className="flex-1">수정</button>
-                        <button className="button-danger flex-1" formAction={deleteRepair}>삭제</button>
+                        {isAdmin ? (
+                          <button className="button-danger flex-1" formAction={deleteRepair}>삭제</button>
+                        ) : null}
                       </div>
                     </form>
                   </td>

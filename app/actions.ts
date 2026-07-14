@@ -4,6 +4,7 @@ import { RepairCategory, RepairPayer, RoomStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { backupDatabaseFile } from "@/lib/backup";
+import { requireAdmin } from "@/lib/admin-auth";
 import { toDate, toDateString, toInt, toStringOrNull } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { rentPaymentStatus, syncRentPaymentsForRoom } from "@/lib/rent-sync";
@@ -21,6 +22,7 @@ function revalidateRentalPages() {
 }
 
 export async function backupDatabase(formData: FormData) {
+  await requireAdmin();
   await backupDatabaseFile().catch(() => null);
 
   const month = String(formData.get("month") ?? "").trim();
@@ -72,6 +74,7 @@ export async function updateRoom(formData: FormData) {
 }
 
 export async function deleteRoom(formData: FormData) {
+  await requireAdmin();
   await prisma.room.delete({ where: { id: toInt(formData, "id") } });
   revalidateRentalPages();
 }
@@ -152,6 +155,7 @@ export async function updateRepair(formData: FormData) {
 }
 
 export async function deleteRepair(formData: FormData) {
+  await requireAdmin();
   await prisma.repair.delete({ where: { id: toInt(formData, "id") } });
   revalidatePath("/repairs");
   revalidatePath("/");

@@ -21,20 +21,20 @@ export function QuickRoomSearch({
   }
 
   return (
-    <form onSubmit={handleSubmit} className={`grid gap-2 ${className}`}>
-      <label className="text-xs font-normal text-slate-500" htmlFor="quick-room-search">
+    <form onSubmit={handleSubmit} className={`grid w-full min-w-0 max-w-full gap-2 overflow-hidden ${className}`}>
+      <label className="truncate text-xs font-normal text-slate-500" htmlFor="quick-room-search">
         빠른 검색
       </label>
-      <div className="flex items-stretch gap-2">
+      <div className="flex w-full min-w-0 max-w-full items-stretch gap-2 overflow-hidden">
         <input
           id="quick-room-search"
-          className="min-h-11 min-w-0 flex-1 rounded-lg px-3 leading-none"
+          className="box-border min-h-11 w-full min-w-0 flex-1 rounded-lg px-3 leading-none"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder={placeholder}
           type="search"
         />
-        <button className="button-primary min-h-11 shrink-0 rounded-lg px-4" type="submit">
+        <button className="button-primary min-h-11 w-auto shrink-0 rounded-lg px-3" type="submit">
           검색
         </button>
       </div>

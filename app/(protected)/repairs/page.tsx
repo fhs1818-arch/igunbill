@@ -38,6 +38,11 @@ function payerTone(payer: RepairPayer) {
   return payer === "LANDLORD" ? "brand" : "default";
 }
 
+const repairGridStyle = {
+  gridTemplateColumns: "90px 136px 130px 130px minmax(180px, 1fr) 120px 120px 110px minmax(160px, 1fr) 150px",
+  minWidth: "1386px"
+};
+
 function RepairCreateFields({ rooms }: { rooms: Array<{ id: number; roomNumber: string }> }) {
   return (
     <>
@@ -250,16 +255,20 @@ export default async function RepairsPage() {
             <table>
               <thead>
                 <tr>
-                  <th>호실</th>
-                  <th>날짜</th>
-                  <th>구분</th>
-                  <th>항목명</th>
-                  <th>내용</th>
-                  <th>금액</th>
-                  <th>부담자</th>
-                  <th>결제여부</th>
-                  <th>메모</th>
-                  <th>관리</th>
+                  <th colSpan={10} className="p-0">
+                    <div className="grid items-center gap-2 px-3 py-3" style={repairGridStyle}>
+                      <span className="text-center">호실</span>
+                      <span className="text-center">날짜</span>
+                      <span className="text-center">구분</span>
+                      <span className="text-left">항목명</span>
+                      <span className="text-left">내용</span>
+                      <span className="text-right">금액</span>
+                      <span className="text-center">부담자</span>
+                      <span className="text-center">결제여부</span>
+                      <span className="text-left">메모</span>
+                      <span className="text-center">관리</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -268,18 +277,19 @@ export default async function RepairsPage() {
                     <td colSpan={10} className="p-0">
                       <form
                         action={updateRepair}
-                        className="grid grid-cols-[90px_135px_130px_130px_1fr_120px_120px_110px_1fr_150px] gap-2 px-3 py-3"
+                        className="grid items-center gap-2 px-3 py-3"
+                        style={repairGridStyle}
                       >
                         <input type="hidden" name="id" value={repair.id} />
-                        <select name="roomId" defaultValue={repair.roomId}>
+                        <select className="text-center" name="roomId" defaultValue={repair.roomId}>
                           {rooms.map((room) => (
                             <option key={room.id} value={room.id}>
                               {room.roomNumber}
                             </option>
                           ))}
                         </select>
-                        <input name="date" type="date" defaultValue={dateInput(repair.date)} required />
-                        <select name="category" defaultValue={repair.category}>
+                        <input className="mx-auto text-center" name="date" type="date" defaultValue={dateInput(repair.date)} required />
+                        <select className="text-center" name="category" defaultValue={repair.category}>
                           {categoryOptions.map(([value, label]) => (
                             <option key={value} value={value}>
                               {label}
@@ -289,10 +299,10 @@ export default async function RepairsPage() {
                         <input name="itemName" defaultValue={repair.itemName} required />
                         <input name="description" defaultValue={repair.description} required />
                         <div className="flex items-center gap-2">
-                          <input className="min-w-0" name="amount" type="number" defaultValue={repair.amount} required />
+                          <input className="min-w-0 text-right" name="amount" type="number" defaultValue={repair.amount} required />
                         </div>
                         <div className="flex items-center">
-                          <select name="payer" defaultValue={repair.payer}>
+                          <select className="text-center" name="payer" defaultValue={repair.payer}>
                             {payerOptions.map(([value, label]) => (
                               <option key={value} value={value}>
                                 {label}
@@ -300,17 +310,17 @@ export default async function RepairsPage() {
                             ))}
                           </select>
                         </div>
-                        <label className="flex items-center gap-2 text-sm text-slate-700">
+                        <label className="flex h-11 items-center justify-center gap-2 text-sm text-slate-700">
                           <input name="isPaid" type="checkbox" defaultChecked={repair.isPaid} className="h-4 w-4" />
                           <StatusBadge tone={paidTone(repair.isPaid)}>{repair.isPaid ? "완료" : "미결제"}</StatusBadge>
                         </label>
                         <input name="memo" defaultValue={repair.memo ?? ""} />
-                        <div className="flex gap-2">
-                          <ActionButton className="flex-1" type="submit">
+                        <div className="flex items-center justify-center gap-2">
+                          <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" type="submit">
                             수정
                           </ActionButton>
                           {isAdmin ? (
-                            <ActionButton className="flex-1" formAction={deleteRepair} variant="danger">
+                            <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" formAction={deleteRepair} variant="danger">
                               삭제
                             </ActionButton>
                           ) : null}

@@ -42,7 +42,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
     <AdminRoleProvider role={adminUser.role}>
       <div className="min-h-screen bg-surface">
         <AppNavigation isAdmin={isAdmin} menus={menus} signOutAction={signOut} />
-        <main className="min-h-screen pb-20 pt-14 md:ml-64 md:pb-0 md:pt-0">{children}</main>
+        <main className="min-h-screen pb-20 pt-14 md:ml-[260px] md:pb-0 md:pt-0">{children}</main>
       </div>
     </AdminRoleProvider>
   );

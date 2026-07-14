@@ -57,14 +57,14 @@ function isActive(pathname: string, href: string) {
 
 function AdminMenu() {
   return (
-    <div className="grid gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+    <div className="grid w-full min-w-0 max-w-full gap-2 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 p-3">
       <p className="flex items-center gap-2 text-xs font-semibold text-slate-500">
         <ShieldCheck className="h-4 w-4" strokeWidth={2.1} />
         관리자 메뉴
       </p>
-      <a className="button-primary flex w-full items-center gap-2" href="/api/backup">
+      <a className="button-primary flex w-full min-w-0 items-center justify-center gap-2 truncate" href="/api/backup">
         <DatabaseBackup className="h-4 w-4" strokeWidth={2.1} />
-        백업 다운로드
+        <span className="min-w-0 truncate">백업 다운로드</span>
       </a>
       <RestoreBackupForm icon={<RotateCcw className="h-4 w-4" strokeWidth={2.1} />} />
     </div>
@@ -77,7 +77,7 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-slate-200 bg-white md:flex">
+      <aside className="fixed inset-y-0 left-0 hidden w-[260px] min-w-0 flex-col overflow-x-hidden border-r border-slate-200 bg-white md:flex">
         <div className="border-b border-slate-200 px-6 py-5">
           <div className="flex items-center gap-3">
             <Image alt="이건빌" height={40} src="/brand/igunbill-app-icon.svg" width={40} />
@@ -87,14 +87,14 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
             </div>
           </div>
         </div>
-        <div className="border-b border-slate-200 p-3">
+        <div className="min-w-0 overflow-hidden border-b border-slate-200 p-3">
           <QuickRoomSearch />
         </div>
-        <nav className="flex-1 space-y-1 p-3">
+        <nav className="min-w-0 flex-1 space-y-1 overflow-x-hidden p-3">
           {menus.map((menu) => (
             <Link
               key={menu.href}
-              className={`block rounded-md px-3 py-2.5 text-sm font-semibold ${
+              className={`flex min-h-11 items-center rounded-md px-3 text-sm font-semibold ${
                 isActive(pathname, menu.href) ? "bg-slate-100 text-ink" : "text-slate-700 hover:bg-slate-100"
               }`}
               href={menu.href}
@@ -104,7 +104,7 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
           ))}
         </nav>
         {isAdmin ? (
-          <div className="border-t border-line p-3">
+          <div className="min-w-0 overflow-hidden border-t border-line p-3">
             <AdminMenu />
           </div>
         ) : null}
@@ -136,7 +136,7 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
             onClick={() => setIsOpen(false)}
             type="button"
           />
-          <aside className="absolute inset-y-0 right-0 flex w-[min(86vw,320px)] flex-col border-l border-slate-200 bg-white shadow-xl">
+          <aside className="absolute inset-y-0 right-0 flex w-[min(86vw,320px)] min-w-0 flex-col overflow-x-hidden border-l border-slate-200 bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
               <div className="flex items-center gap-2">
                 <Image alt="이건빌" height={36} src="/brand/igunbill-app-icon.svg" width={36} />
@@ -149,10 +149,10 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
                 닫기
               </button>
             </div>
-            <div className="border-b border-slate-200 p-3">
+            <div className="min-w-0 overflow-hidden border-b border-slate-200 p-3">
               <QuickRoomSearch />
             </div>
-            <nav className="flex-1 space-y-1 p-3">
+            <nav className="min-w-0 flex-1 space-y-1 overflow-x-hidden p-3">
               {menus.map((menu) => {
                 const Icon = menuIcons[menu.href as keyof typeof menuIcons] ?? LayoutDashboard;
                 return (
@@ -171,7 +171,7 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
               })}
             </nav>
             {isAdmin ? (
-              <div className="border-t border-slate-200 p-3">
+              <div className="min-w-0 overflow-hidden border-t border-slate-200 p-3">
                 <AdminMenu />
               </div>
             ) : null}

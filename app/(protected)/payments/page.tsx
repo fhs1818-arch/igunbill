@@ -33,6 +33,11 @@ function paymentStatusTone(status: string) {
   }[status] as "brand" | "positive" | "negative";
 }
 
+const paymentGridStyle = {
+  gridTemplateColumns: "90px 160px 130px 150px 135px minmax(160px, 1fr) 210px",
+  minWidth: "1055px"
+};
+
 export default async function PaymentsPage({
   searchParams
 }: {
@@ -135,36 +140,40 @@ export default async function PaymentsPage({
             <table>
               <thead>
                 <tr>
-                  <th>호실</th>
-                  <th>임차인</th>
-                  <th>월세</th>
-                  <th>입금일</th>
-                  <th>상태</th>
-                  <th>메모</th>
-                  <th>관리</th>
+                  <th colSpan={7} className="p-0">
+                    <div className="grid items-center gap-2 px-3 py-3" style={paymentGridStyle}>
+                      <span className="text-center">호실</span>
+                      <span className="text-left">임차인</span>
+                      <span className="text-right">월세</span>
+                      <span className="text-center">입금일</span>
+                      <span className="text-center">상태</span>
+                      <span className="text-left">메모</span>
+                      <span className="text-center">관리</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {payments.map((payment) => (
                   <tr key={payment.id} className="transition-colors hover:bg-slate-50">
                     <td colSpan={7} className="p-0">
-                      <form action={updatePayment} className="grid grid-cols-[90px_160px_130px_150px_135px_1fr_210px] gap-2 px-3 py-3">
+                      <form action={updatePayment} className="grid items-center gap-2 px-3 py-3" style={paymentGridStyle}>
                         <input type="hidden" name="id" value={payment.id} />
-                        <div className="py-2 font-bold text-ink">{payment.room.roomNumber}</div>
-                        <div className="py-2 text-slate-700">{payment.room.tenantName ?? "-"}</div>
-                        <div className="py-2">
+                        <div className="py-2 text-center font-bold text-ink">{payment.room.roomNumber}</div>
+                        <div className="py-2 text-left text-slate-700">{payment.room.tenantName ?? "-"}</div>
+                        <div className="py-2 text-right">
                           <MoneyText amount={payment.monthlyRent} />
                         </div>
-                        <input name="paidDate" type="date" defaultValue={dateInput(payment.paidDate)} />
-                        <div className="py-1.5">
+                        <input className="mx-auto text-center" name="paidDate" type="date" defaultValue={dateInput(payment.paidDate)} />
+                        <div className="flex items-center justify-center">
                           <StatusBadge tone={paymentStatusTone(payment.status)}>
                             {paymentStatusLabel(payment.status)}
                           </StatusBadge>
                         </div>
                         <input name="memo" defaultValue={payment.memo ?? ""} />
-                        <div className="flex gap-2">
-                          <ActionButton className="flex-1" type="submit">수정</ActionButton>
-                          <ActionButton className="flex-1" formAction={markPaymentPaid} variant="primary">입금처리</ActionButton>
+                        <div className="flex items-center justify-center gap-2">
+                          <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" type="submit">수정</ActionButton>
+                          <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" formAction={markPaymentPaid} variant="primary">입금처리</ActionButton>
                         </div>
                       </form>
                     </td>

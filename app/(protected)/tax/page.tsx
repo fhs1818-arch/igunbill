@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { MoneyText } from "@/components/ui/MoneyText";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { requireAdmin } from "@/lib/admin-auth";
 import { dateInput } from "@/lib/format";
 import {
@@ -56,6 +58,12 @@ function InfoRow({ label, value, strong }: { label: string; value: React.ReactNo
       </span>
     </div>
   );
+}
+
+function taxPaymentTone(status: string) {
+  if (status === "PAID") return "positive" as const;
+  if (status === "OVERDUE") return "negative" as const;
+  return "brand" as const;
 }
 
 export default async function TaxPage({
@@ -145,9 +153,9 @@ export default async function TaxPage({
                     <p className="text-lg font-bold text-ink">{income.roomNumber}</p>
                     <p className="mt-1 break-words text-sm text-slate-600">{income.tenantName || "-"}</p>
                   </div>
-                  <span className="shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700">
+                  <StatusBadge tone={taxPaymentTone(income.status)}>
                     {paymentStatusText(income.status)}
-                  </span>
+                  </StatusBadge>
                 </div>
                 <div className="grid gap-2">
                   <InfoRow label="날짜" value={income.date} />
@@ -162,9 +170,7 @@ export default async function TaxPage({
               </article>
             ))}
             {report.incomes.length === 0 ? (
-              <div className="border border-slate-100 bg-slate-50 p-6 text-center text-sm text-slate-500">
-                선택한 기간의 임대수입 내역이 없습니다.
-              </div>
+              <EmptyState title="선택한 기간의 임대수입 내역이 없습니다." />
             ) : null}
           </div>
 
@@ -172,35 +178,35 @@ export default async function TaxPage({
             <table>
               <thead>
                 <tr>
-                  <th>날짜</th>
-                  <th>건물</th>
-                  <th>호실</th>
-                  <th>세입자</th>
-                  <th>월세</th>
-                  <th>관리비</th>
-                  <th>입금일</th>
-                  <th>상태</th>
-                  <th>비고</th>
+                  <th className="text-center">날짜</th>
+                  <th className="text-left">건물</th>
+                  <th className="text-center">호실</th>
+                  <th className="text-left">세입자</th>
+                  <th className="text-right">월세</th>
+                  <th className="text-right">관리비</th>
+                  <th className="text-center">입금일</th>
+                  <th className="text-center">상태</th>
+                  <th className="text-left">비고</th>
                 </tr>
               </thead>
               <tbody>
                 {report.incomes.slice(0, 50).map((income, index) => (
                   <tr key={`${income.roomNumber}-${income.date}-${index}`}>
-                    <td>{income.date}</td>
+                    <td className="text-center">{income.date}</td>
                     <td>{income.building}</td>
-                    <td>{income.roomNumber}</td>
+                    <td className="text-center">{income.roomNumber}</td>
                     <td>{income.tenantName || "-"}</td>
-                    <td><MoneyText amount={income.monthlyRent} /></td>
-                    <td>{income.managementFee || ""}</td>
-                    <td>{income.paidDate || "-"}</td>
-                    <td>{paymentStatusText(income.status)}</td>
+                    <td className="text-right"><MoneyText amount={income.monthlyRent} /></td>
+                    <td className="text-right">{income.managementFee || ""}</td>
+                    <td className="text-center">{income.paidDate || "-"}</td>
+                    <td className="text-center"><StatusBadge tone={taxPaymentTone(income.status)}>{paymentStatusText(income.status)}</StatusBadge></td>
                     <td>{income.memo || ""}</td>
                   </tr>
                 ))}
                 {report.incomes.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-8 text-center text-slate-500">
-                      선택한 기간의 임대수입 내역이 없습니다.
+                    <td colSpan={9} className="py-8">
+                      <EmptyState title="선택한 기간의 임대수입 내역이 없습니다." />
                     </td>
                   </tr>
                 ) : null}
@@ -226,9 +232,9 @@ export default async function TaxPage({
                     <p className="break-words text-base font-bold text-ink">{expense.content}</p>
                     <p className="mt-1 text-sm text-slate-600">{expense.date}</p>
                   </div>
-                  <span className="shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700">
+                  <StatusBadge tone="default">
                     {repairCategoryText(expense.category)}
-                  </span>
+                  </StatusBadge>
                 </div>
                 <div className="grid gap-2">
                   <InfoRow label="날짜" value={expense.date} />
@@ -243,9 +249,7 @@ export default async function TaxPage({
               </article>
             ))}
             {report.expenses.length === 0 ? (
-              <div className="border border-slate-100 bg-slate-50 p-6 text-center text-sm text-slate-500">
-                선택한 기간의 필요경비 내역이 없습니다.
-              </div>
+              <EmptyState title="선택한 기간의 필요경비 내역이 없습니다." />
             ) : null}
           </div>
 
@@ -253,33 +257,33 @@ export default async function TaxPage({
             <table>
               <thead>
                 <tr>
-                  <th>날짜</th>
-                  <th>건물</th>
-                  <th>구분</th>
-                  <th>내용</th>
-                  <th>금액</th>
-                  <th>거래처</th>
-                  <th>증빙</th>
-                  <th>부담자</th>
+                  <th className="text-center">날짜</th>
+                  <th className="text-left">건물</th>
+                  <th className="text-center">구분</th>
+                  <th className="text-left">내용</th>
+                  <th className="text-right">금액</th>
+                  <th className="text-left">거래처</th>
+                  <th className="text-left">증빙</th>
+                  <th className="text-center">부담자</th>
                 </tr>
               </thead>
               <tbody>
                 {report.expenses.slice(0, 50).map((expense, index) => (
                   <tr key={`${expense.date}-${expense.content}-${index}`}>
-                    <td>{expense.date}</td>
+                    <td className="text-center">{expense.date}</td>
                     <td>{expense.building}</td>
-                    <td>{repairCategoryText(expense.category)}</td>
+                    <td className="text-center"><StatusBadge tone="default">{repairCategoryText(expense.category)}</StatusBadge></td>
                     <td>{expense.content}</td>
-                    <td><MoneyText amount={expense.amount} /></td>
+                    <td className="text-right"><MoneyText amount={expense.amount} /></td>
                     <td>{expense.vendor}</td>
                     <td>{expense.evidence}</td>
-                    <td>{repairPayerText(expense.payer)}</td>
+                    <td className="text-center">{repairPayerText(expense.payer)}</td>
                   </tr>
                 ))}
                 {report.expenses.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-8 text-center text-slate-500">
-                      선택한 기간의 필요경비 내역이 없습니다.
+                    <td colSpan={8} className="py-8">
+                      <EmptyState title="선택한 기간의 필요경비 내역이 없습니다." />
                     </td>
                   </tr>
                 ) : null}

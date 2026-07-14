@@ -56,7 +56,7 @@ export function RestoreBackupForm({ icon }: RestoreBackupFormProps) {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex w-full min-w-0 max-w-full flex-wrap items-center gap-2 overflow-hidden">
       <input
         accept="application/json,.json"
         className="hidden"
@@ -64,11 +64,11 @@ export function RestoreBackupForm({ icon }: RestoreBackupFormProps) {
         ref={inputRef}
         type="file"
       />
-      <button className="button gap-2" disabled={isPending} onClick={openFilePicker} type="button">
+      <button className="button min-w-0 flex-1 gap-2 whitespace-nowrap" disabled={isPending} onClick={openFilePicker} type="button">
         {icon}
-        {isPending ? "복원 중..." : "백업 복원"}
+        <span className="min-w-0 truncate">{isPending ? "복원 중..." : "백업 복원"}</span>
       </button>
-      {message ? <span className="text-sm font-normal text-red-700">{message}</span> : null}
+      {message ? <span className="min-w-0 break-words text-sm font-normal text-red-700">{message}</span> : null}
     </div>
   );
 }

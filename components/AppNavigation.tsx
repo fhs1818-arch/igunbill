@@ -4,6 +4,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import {
+  DatabaseBackup,
+  DoorOpen,
+  History,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Receipt,
+  RotateCcw,
+  ShieldCheck,
+  Wallet,
+  Wrench
+} from "lucide-react";
 import { RestoreBackupForm } from "@/components/RestoreBackupForm";
 import { QuickRoomSearch } from "@/components/QuickRoomSearch";
 import { PwaInstallButton } from "@/components/PwaInstallButton";
@@ -20,11 +33,22 @@ type AppNavigationProps = {
 };
 
 const bottomMenus = [
-  { href: "/", label: "대시보드" },
-  { href: "/rooms", label: "호실" },
-  { href: "/payments", label: "월세" },
-  { href: "/repairs", label: "수리" }
+  { href: "/", label: "대시보드", Icon: LayoutDashboard },
+  { href: "/rooms", label: "호실", Icon: DoorOpen },
+  { href: "/payments", label: "월세", Icon: Wallet },
+  { href: "/repairs", label: "수리", Icon: Wrench },
+  { href: "/move", label: "퇴실", Icon: LogOut }
 ];
+
+const menuIcons = {
+  "/": LayoutDashboard,
+  "/rooms": DoorOpen,
+  "/payments": Wallet,
+  "/repairs": Wrench,
+  "/move": LogOut,
+  "/tax": Receipt,
+  "/audit-logs": History
+};
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -34,11 +58,15 @@ function isActive(pathname: string, href: string) {
 function AdminMenu() {
   return (
     <div className="grid gap-2 rounded-md border border-line bg-slate-50 p-3">
-      <p className="text-xs font-bold text-slate-500">관리자 메뉴</p>
-      <a className="button-primary w-full" href="/api/backup">
+      <p className="flex items-center gap-2 text-xs font-bold text-slate-500">
+        <ShieldCheck className="h-4 w-4" />
+        관리자 메뉴
+      </p>
+      <a className="button-primary flex w-full items-center gap-2" href="/api/backup">
+        <DatabaseBackup className="h-4 w-4" />
         백업 다운로드
       </a>
-      <RestoreBackupForm />
+      <RestoreBackupForm icon={<RotateCcw className="h-4 w-4" />} />
     </div>
   );
 }
@@ -96,7 +124,7 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
           </div>
         </div>
         <button aria-label="메뉴 열기" className="px-3 py-2" onClick={() => setIsOpen(true)} type="button">
-          메뉴
+          <Menu className="h-5 w-5" />
         </button>
       </header>
 
@@ -125,18 +153,22 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
               <QuickRoomSearch />
             </div>
             <nav className="flex-1 space-y-1 p-3">
-              {menus.map((menu) => (
-                <Link
-                  key={menu.href}
-                  className={`block rounded-md px-3 py-3 text-sm font-semibold ${
-                    isActive(pathname, menu.href) ? "bg-slate-100 text-ink" : "text-slate-700 hover:bg-slate-100"
-                  }`}
-                  href={menu.href}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {menu.label}
-                </Link>
-              ))}
+              {menus.map((menu) => {
+                const Icon = menuIcons[menu.href as keyof typeof menuIcons] ?? LayoutDashboard;
+                return (
+                  <Link
+                    key={menu.href}
+                    className={`flex items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold ${
+                      isActive(pathname, menu.href) ? "bg-slate-100 text-ink" : "text-slate-700 hover:bg-slate-100"
+                    }`}
+                    href={menu.href}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Icon className="h-5 w-5" />
+                    {menu.label}
+                  </Link>
+                );
+              })}
             </nav>
             {isAdmin ? (
               <div className="border-t border-line p-3">
@@ -147,7 +179,8 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
               <PwaInstallButton />
             </div>
             <form action={signOutAction} className="border-t border-line p-3">
-              <button className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
+              <button className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
+                <LogOut className="h-4 w-4" />
                 로그아웃
               </button>
             </form>
@@ -156,26 +189,18 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
       ) : null}
 
       <nav className="fixed inset-x-0 bottom-0 z-40 grid h-16 grid-cols-5 border-t border-line bg-white md:hidden">
-        {bottomMenus.map((menu) => (
+        {bottomMenus.map(({ Icon, ...menu }) => (
           <Link
             key={menu.href}
-            className={`flex flex-col items-center justify-center text-xs font-semibold ${
-              isActive(pathname, menu.href) ? "text-brand" : "text-slate-500"
+            className={`flex min-h-16 flex-col items-center justify-center gap-0.5 text-[11px] font-bold ${
+              isActive(pathname, menu.href) ? "text-brand" : "text-slate-400"
             }`}
             href={menu.href}
           >
-            <span className="text-[11px]">{menu.label}</span>
+            <Icon className="h-[21px] w-[21px]" strokeWidth={2.2} />
+            <span>{menu.label}</span>
           </Link>
         ))}
-        <button
-          className={`flex flex-col items-center justify-center rounded-none border-0 bg-white text-xs font-semibold ${
-            isOpen ? "text-brand" : "text-slate-500"
-          }`}
-          onClick={() => setIsOpen(true)}
-          type="button"
-        >
-          메뉴
-        </button>
       </nav>
     </>
   );

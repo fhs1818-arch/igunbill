@@ -1,12 +1,16 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, ReactNode, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const CONFIRM_MESSAGE =
   "기존 Room, RentPayment, Repair 데이터가 모두 삭제되고 백업 데이터로 교체됩니다. 계속하시겠습니까?";
 
-export function RestoreBackupForm() {
+type RestoreBackupFormProps = {
+  icon?: ReactNode;
+};
+
+export function RestoreBackupForm({ icon }: RestoreBackupFormProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState("");
@@ -60,7 +64,8 @@ export function RestoreBackupForm() {
         ref={inputRef}
         type="file"
       />
-      <button className="button" disabled={isPending} onClick={openFilePicker} type="button">
+      <button className="button gap-2" disabled={isPending} onClick={openFilePicker} type="button">
+        {icon}
         {isPending ? "복원 중..." : "백업 복원"}
       </button>
       {message ? <span className="text-sm font-semibold text-red-700">{message}</span> : null}

@@ -50,14 +50,14 @@ export default async function MovePage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    <div className="rounded-lg bg-slate-50 p-4">
+                  <div className="mt-4 rounded-lg bg-slate-50 p-4">
+                    <div className="flex items-center justify-between gap-3">
                       <p className="text-xs font-bold text-slate-500">보증금</p>
-                      <MoneyText amount={room.deposit} className="mt-1 block text-xl" />
+                      <MoneyText amount={room.deposit} className="text-xl" />
                     </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
+                    <div className="mt-2 flex items-center justify-between gap-3">
                       <p className="text-xs font-bold text-slate-500">월세</p>
-                      <MoneyText amount={room.monthlyRent} className="mt-1 block text-xl" />
+                      <MoneyText amount={room.monthlyRent} className="text-xl" />
                     </div>
                   </div>
 
@@ -115,15 +115,13 @@ export default async function MovePage() {
             <table>
               <thead>
                 <tr>
-                  <th colSpan={9} className="p-0">
-                    <div className="grid grid-cols-[80px_140px_150px_110px_90px_120px_160px_90px_180px] items-center gap-2 px-3 py-3">
+                  <th colSpan={7} className="p-0">
+                    <div className="grid grid-cols-[80px_120px_150px_170px_150px_90px_minmax(180px,1fr)] items-center gap-1 px-3 py-3">
                       <span className="text-center">호실</span>
                       <span className="text-left">임차인</span>
                       <span className="text-center">연락처</span>
-                      <span className="text-right">보증금</span>
-                      <span className="text-right">월세</span>
-                      <span className="text-center">입실날짜</span>
-                      <span className="text-center">퇴실날짜</span>
+                      <span className="text-right">보증금 / 월세</span>
+                      <span className="text-center">퇴실일</span>
                       <span className="text-center">남은일수</span>
                       <span className="text-center">관리</span>
                     </div>
@@ -135,23 +133,26 @@ export default async function MovePage() {
                   const notice = contractNotice(room.moveOutDate);
                   return (
                     <tr key={room.id} className="transition-colors hover:bg-slate-50">
-                      <td colSpan={9} className="p-0">
+                      <td colSpan={7} className="p-0">
                         <form
                           action={updateMoveOutDate}
-                          className="grid grid-cols-[80px_140px_150px_110px_90px_120px_160px_90px_180px] items-center gap-2 px-3 py-3"
+                          className="grid grid-cols-[80px_120px_150px_170px_150px_90px_minmax(180px,1fr)] items-center gap-1 px-3 py-3"
                         >
                           <input type="hidden" name="roomId" value={room.id} />
                           <input type="hidden" name="memo" value={room.memo ?? ""} />
                           <div className="py-2 text-center font-bold text-ink">{room.roomNumber}</div>
                           <div className="py-2 text-left text-slate-700">{room.tenantName ?? "-"}</div>
                           <div className="py-2 text-center text-slate-700">{room.tenantPhone ?? "-"}</div>
-                          <div className="py-2 text-right">
-                            <MoneyText amount={room.deposit} />
+                          <div className="space-y-1 py-2 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <span className="text-xs font-semibold text-slate-500">보증금</span>
+                              <MoneyText amount={room.deposit} />
+                            </div>
+                            <div className="flex items-center justify-end gap-1">
+                              <span className="text-xs font-semibold text-slate-500">월세</span>
+                              <MoneyText amount={room.monthlyRent} />
+                            </div>
                           </div>
-                          <div className="py-2 text-right">
-                            <MoneyText amount={room.monthlyRent} />
-                          </div>
-                          <div className="py-2 text-center text-slate-700">{dateInput(room.moveInDate) || "-"}</div>
                           <input
                             className="mx-auto h-11 w-[136px] text-center"
                             name="moveOutDate"
@@ -188,7 +189,7 @@ export default async function MovePage() {
                 })}
                 {rooms.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-8">
+                    <td colSpan={7} className="py-8">
                       <EmptyState title="등록된 퇴실 내역이 없습니다." />
                     </td>
                   </tr>

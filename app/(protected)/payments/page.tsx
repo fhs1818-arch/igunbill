@@ -34,8 +34,8 @@ function paymentStatusTone(status: string) {
 }
 
 const paymentGridStyle = {
-  gridTemplateColumns: "80px 140px 100px 150px 120px minmax(240px, 1fr) 220px",
-  minWidth: "1090px"
+  gridTemplateColumns: "80px 140px 110px 160px 120px minmax(220px, 1fr)",
+  minWidth: "830px"
 };
 
 export default async function PaymentsPage({
@@ -106,10 +106,12 @@ export default async function PaymentsPage({
                     <span className="text-slate-500">입금일</span>
                     <span className="font-semibold">{dateInput(payment.paidDate) || "-"}</span>
                   </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-slate-500">비고</span>
-                    <span className="min-w-0 break-words text-right font-semibold">{payment.memo || "-"}</span>
-                  </div>
+                  {payment.memo ? (
+                    <div className="flex justify-between gap-3">
+                      <span className="text-slate-500">비고</span>
+                      <span className="min-w-0 break-words text-right font-semibold">{payment.memo}</span>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 gap-3">
@@ -140,14 +142,13 @@ export default async function PaymentsPage({
             <table>
               <thead>
                 <tr>
-                  <th colSpan={7} className="p-0">
-                    <div className="grid items-center gap-2 px-3 py-3" style={paymentGridStyle}>
+                  <th colSpan={6} className="p-0">
+                    <div className="grid items-center gap-1 px-3 py-3" style={paymentGridStyle}>
                       <span className="text-center">호실</span>
                       <span className="text-left">임차인</span>
                       <span className="text-right">월세</span>
                       <span className="text-center">입금일</span>
                       <span className="text-center">상태</span>
-                      <span className="text-left">메모</span>
                       <span className="text-center">관리</span>
                     </div>
                   </th>
@@ -156,8 +157,8 @@ export default async function PaymentsPage({
               <tbody>
                 {payments.map((payment) => (
                   <tr key={payment.id} className="transition-colors hover:bg-slate-50">
-                    <td colSpan={7} className="p-0">
-                      <form action={updatePayment} className="grid items-center gap-2 px-3 py-3" style={paymentGridStyle}>
+                    <td colSpan={6} className="p-0">
+                      <form action={updatePayment} className="grid items-center gap-1 px-3 py-3" style={paymentGridStyle}>
                         <input type="hidden" name="id" value={payment.id} />
                         <div className="py-2 text-center font-bold text-ink">{payment.room.roomNumber}</div>
                         <div className="py-2 text-left text-slate-700">{payment.room.tenantName ?? "-"}</div>
@@ -175,18 +176,23 @@ export default async function PaymentsPage({
                             {paymentStatusLabel(payment.status)}
                           </StatusBadge>
                         </div>
-                        <input className="w-full min-w-0" name="memo" defaultValue={payment.memo ?? ""} />
                         <div className="flex items-center justify-center gap-2">
                           <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" type="submit">수정</ActionButton>
                           <ActionButton className="h-11 min-w-0 flex-1 whitespace-nowrap px-3" formAction={markPaymentPaid} variant="primary">입금처리</ActionButton>
                         </div>
+                        <details className="col-span-6">
+                          <summary className="cursor-pointer rounded-lg bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-500">
+                            메모
+                          </summary>
+                          <input className="mt-2 w-full min-w-0" name="memo" defaultValue={payment.memo ?? ""} />
+                        </details>
                       </form>
                     </td>
                   </tr>
                 ))}
                 {payments.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-8">
+                    <td colSpan={6} className="py-8">
                       <EmptyState title="선택한 달의 월세 내역이 없습니다." />
                     </td>
                   </tr>

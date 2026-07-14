@@ -1,4 +1,3 @@
-import type { RoomStatus } from "@prisma/client";
 import { moveOut, updateMoveOutDate } from "@/app/actions";
 import { PageHeader } from "@/components/PageHeader";
 import { ActionButton } from "@/components/ui/ActionButton";
@@ -6,7 +5,6 @@ import { AppCard } from "@/components/ui/AppCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MoneyText } from "@/components/ui/MoneyText";
 import { Section } from "@/components/ui/Section";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 import { dateInput } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -28,25 +26,6 @@ function contractNotice(moveOutDate: string | null) {
   if (daysLeft < 0) return { daysLeft, label: "계약만료" };
   if (daysLeft <= 60) return { daysLeft, label: "퇴실예정 60일 이내" };
   return { daysLeft, label: "-" };
-}
-
-function roomStatusLabel(status: RoomStatus) {
-  return {
-    VACANT: "공실",
-    OCCUPIED: "입주중",
-    MOVE_OUT_SOON: "퇴실예정"
-  }[status];
-}
-
-function moveStatus(room: { status: RoomStatus; moveOutDate: string | null }) {
-  if (room.status === "VACANT") return { label: "퇴실완료", tone: "positive" as const };
-  if (room.status === "MOVE_OUT_SOON" || room.moveOutDate) return { label: "퇴실예정", tone: "warning" as const };
-  return { label: "취소", tone: "default" as const };
-}
-
-function NoticeBadge({ label }: { label: string }) {
-  if (label === "-") return <span className="text-slate-400">-</span>;
-  return <StatusBadge tone={label === "계약만료" ? "negative" : "warning"}>{label}</StatusBadge>;
 }
 
 export default async function MovePage() {
@@ -101,10 +80,6 @@ export default async function MovePage() {
                         {notice.daysLeft === null ? "-" : `${notice.daysLeft}일`}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="shrink-0 text-slate-500">알림</span>
-                      <NoticeBadge label={notice.label} />
-                    </div>
                     <div className="flex justify-between gap-3">
                       <span className="shrink-0 text-slate-500">메모</span>
                       <span className="min-w-0 break-words text-right font-semibold">{room.memo || "-"}</span>
@@ -140,17 +115,15 @@ export default async function MovePage() {
             <table>
               <thead>
                 <tr>
-                  <th>호실</th>
-                  <th>임차인</th>
-                  <th>연락처</th>
-                  <th>현재상태</th>
-                  <th>보증금</th>
-                  <th>월세</th>
-                  <th>입실날짜</th>
-                  <th>퇴실날짜</th>
-                  <th>남은일수</th>
-                  <th>알림</th>
-                  <th>관리</th>
+                  <th className="text-center">호실</th>
+                  <th className="text-left">임차인</th>
+                  <th className="text-center">연락처</th>
+                  <th className="text-right">보증금</th>
+                  <th className="text-right">월세</th>
+                  <th className="text-center">입실날짜</th>
+                  <th className="text-center">퇴실날짜</th>
+                  <th className="text-center">남은일수</th>
+                  <th className="text-center">관리</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,45 +131,43 @@ export default async function MovePage() {
                   const notice = contractNotice(room.moveOutDate);
                   return (
                     <tr key={room.id} className="transition-colors hover:bg-slate-50">
-                      <td colSpan={11} className="p-0">
+                      <td colSpan={9} className="p-0">
                         <form
                           action={updateMoveOutDate}
-                          className="grid grid-cols-[80px_120px_140px_105px_115px_105px_130px_130px_100px_150px_170px] gap-2 px-3 py-3"
+                          className="grid grid-cols-[72px_120px_140px_115px_105px_120px_120px_90px_170px] gap-2 px-3 py-3"
                         >
                           <input type="hidden" name="roomId" value={room.id} />
                           <input type="hidden" name="memo" value={room.memo ?? ""} />
-                          <div className="py-2 font-bold text-ink">{room.roomNumber}</div>
-                          <div className="py-2 text-slate-700">{room.tenantName ?? "-"}</div>
-                          <div className="py-2 text-slate-700">{room.tenantPhone ?? "-"}</div>
-                          <div className="py-1.5">
-                            <StatusBadge tone={room.status === "VACANT" ? "default" : room.status === "MOVE_OUT_SOON" ? "warning" : "positive"}>
-                              {roomStatusLabel(room.status)}
-                            </StatusBadge>
-                          </div>
-                          <div className="py-2">
+                          <div className="py-2 text-center font-bold text-ink">{room.roomNumber}</div>
+                          <div className="py-2 text-left text-slate-700">{room.tenantName ?? "-"}</div>
+                          <div className="py-2 text-center text-slate-700">{room.tenantPhone ?? "-"}</div>
+                          <div className="py-2 text-right">
                             <MoneyText amount={room.deposit} />
                           </div>
-                          <div className="py-2">
+                          <div className="py-2 text-right">
                             <MoneyText amount={room.monthlyRent} />
                           </div>
-                          <div className="py-2 text-slate-700">{dateInput(room.moveInDate) || "-"}</div>
+                          <div className="py-2 text-center text-slate-700">{dateInput(room.moveInDate) || "-"}</div>
                           <input name="moveOutDate" type="date" defaultValue={dateInput(room.moveOutDate)} />
-                          <div className={notice.daysLeft !== null && notice.daysLeft <= 60 ? "py-2 font-bold text-red-700" : "py-2 text-slate-700"}>
+                          <div
+                            className={
+                              notice.daysLeft !== null && notice.daysLeft <= 60
+                                ? "py-2 text-center font-bold text-red-700"
+                                : "py-2 text-center text-slate-700"
+                            }
+                          >
                             {notice.daysLeft === null ? "-" : `${notice.daysLeft}일`}
                           </div>
-                          <div className="py-1.5">
-                            <NoticeBadge label={notice.label} />
-                          </div>
-                          <div className="flex gap-2">
-                            <ActionButton className="flex-1" type="submit">
+                          <div className="flex items-center justify-center gap-2">
+                            <ActionButton className="h-11 flex-1" type="submit">
                               수정
                             </ActionButton>
                             {room.status === "VACANT" ? (
-                              <div className="flex flex-1 items-center justify-center rounded-lg bg-slate-50 px-3 py-2 text-sm font-bold text-slate-400">
+                              <div className="flex h-11 flex-1 items-center justify-center rounded-lg bg-slate-50 px-3 py-2 text-sm font-bold text-slate-400">
                                 완료
                               </div>
                             ) : (
-                              <ActionButton className="flex-1" formAction={moveOut} variant="danger">
+                              <ActionButton className="h-11 flex-1" formAction={moveOut} variant="danger">
                                 퇴실완료
                               </ActionButton>
                             )}
@@ -208,7 +179,7 @@ export default async function MovePage() {
                 })}
                 {rooms.length === 0 ? (
                   <tr>
-                    <td colSpan={11} className="py-8">
+                    <td colSpan={9} className="py-8">
                       <EmptyState title="등록된 퇴실 내역이 없습니다." />
                     </td>
                   </tr>

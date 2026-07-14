@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
-import { RestoreBackupForm } from "@/components/RestoreBackupForm";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
 import { addMonths, monthKey, monthLabel, won } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -209,48 +208,55 @@ export default async function DashboardPage({
   const prevMonth = addMonths(selectedMonth, -1);
   const nextMonth = addMonths(selectedMonth, 1);
   const todoCount = dueTodayCount + currentMonthOverdueCount + selectedMonthMoveOutSoonCount;
-  const monthlyStats = [
-    { label: "총 보증금", value: won(totalDeposit) },
-    { label: "선택월 월세 예정금액", value: won(monthlyRentTotal) },
-    { label: "선택월 입금완료 금액", value: won(monthlyPaidTotal), tone: "text-emerald-700" },
-    { label: "선택월 미납 금액", value: won(monthlyOverdueTotal), tone: "text-red-700" },
-    {
-      label: "선택월 미납 호실 수",
-      value: `${monthlyPayments.filter((payment) => payment.status === "OVERDUE").length}건`,
-      tone: "text-red-700"
-    },
-    { label: "선택월 수리비 합계", value: won(monthlyRepairTotal) },
-    { label: "선택월 부동산중개비 합계", value: won(monthlyBrokerageTotal) }
-  ];
   const alertCards = [
     {
       href: "/payments",
-      label: "입금예정",
-      note: "오늘 기준",
+      label: "입금",
+      note: "오늘",
       tone: "border-red-100 bg-red-50 text-red-700",
       value: dueTodayCount
     },
     {
       href: "/payments",
       label: "미납",
-      note: "현재 월 기준",
+      note: "현재월",
       tone: "border-orange-100 bg-orange-50 text-orange-700",
       value: currentMonthOverdueCount
     },
     {
       href: "/move",
-      label: "퇴실예정",
-      note: "선택월 기준",
+      label: "퇴실",
+      note: "선택월",
       tone: "border-yellow-100 bg-yellow-50 text-yellow-700",
       value: selectedMonthMoveOutSoonCount
     },
     {
       href: "/rooms",
       label: "공실",
-      note: "현재 상태",
+      note: "현재",
       tone: "border-emerald-100 bg-emerald-50 text-emerald-700",
       value: vacantRoomCount
     }
+  ];
+  const primaryStats = [
+    {
+      label: "이번달 순수익",
+      value: won(monthlyNetIncome),
+      tone: monthlyNetIncome >= 0 ? "text-emerald-700" : "text-red-700"
+    },
+    { label: "총 보증금", value: won(totalDeposit) },
+    { label: "월세 예정금액", value: won(monthlyRentTotal) }
+  ];
+  const moreMonthlyStats = [
+    { label: "입금완료 금액", value: won(monthlyPaidTotal), tone: "text-emerald-700" },
+    { label: "미납 금액", value: won(monthlyOverdueTotal), tone: "text-red-700" },
+    {
+      label: "미납 호실 수",
+      value: `${monthlyPayments.filter((payment) => payment.status === "OVERDUE").length}건`,
+      tone: "text-red-700"
+    },
+    { label: "수리비 합계", value: won(monthlyRepairTotal) },
+    { label: "부동산중개비 합계", value: won(monthlyBrokerageTotal) }
   ];
   const yearlyStats = [
     { label: "올해 총 월세 예정금액", value: won(yearlyRentTotal) },
@@ -267,103 +273,88 @@ export default async function DashboardPage({
 
   return (
     <>
-      <PageHeader
-        title="대시보드"
-        description={`${monthLabel(selectedMonth)} 기준 이건빌 현황`}
-        actions={
-          isAdmin ? (
-            <div className="flex items-center gap-2">
-              <a className="button-primary" href="/api/backup">
-                백업 다운로드
-              </a>
-              <RestoreBackupForm />
-            </div>
-          ) : null
-        }
-      />
-      <section className="p-4 md:p-8">
+      <PageHeader title="대시보드" description={`${monthLabel(selectedMonth)} 기준 이건빌 현황`} />
+      <section className="p-3 sm:p-4 md:p-6 xl:p-8">
         {restoreStatus === "success" ? (
-          <div className="mb-4 border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+          <div className="mb-3 border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
             백업 복원이 완료되었습니다.
           </div>
         ) : null}
 
-        <div className="mb-4 border border-line bg-white p-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mb-3 border border-line bg-white p-4 md:p-5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-sm font-semibold text-slate-500">안녕하세요.</p>
-              <h3 className="mt-1 text-2xl font-bold text-ink">오늘도 이건빌 관리를 시작합니다.</h3>
+              <h3 className="mt-1 text-xl font-bold text-ink md:text-2xl">오늘도 이건빌 관리를 시작합니다.</h3>
             </div>
-            <div className="border border-slate-100 bg-slate-50 px-5 py-4">
-              <p className="text-sm font-semibold text-slate-500">오늘 해야 할 일</p>
-              <p className="mt-1 text-3xl font-bold text-ink">{todoCount}건</p>
+            <div className="border border-slate-100 bg-slate-50 px-4 py-3">
+              <p className="text-xs font-semibold text-slate-500">오늘 할 일</p>
+              <p className="mt-1 text-2xl font-bold text-ink">{todoCount}건</p>
             </div>
           </div>
         </div>
 
-        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mb-3 grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
           {alertCards.map((card) => (
-            <Link key={card.label} className={`border p-5 transition hover:shadow-sm ${card.tone}`} href={card.href}>
-              <div className="text-sm font-semibold">{card.label}</div>
-              <div className="mt-2 text-3xl font-bold">{card.value}건</div>
-              <div className="mt-2 text-xs font-semibold opacity-80">{card.note}</div>
+            <Link key={card.label} className={`border p-3 transition hover:shadow-sm sm:p-4 ${card.tone}`} href={card.href}>
+              <div className="text-xs font-semibold sm:text-sm">{card.label}</div>
+              <div className="mt-1 text-2xl font-bold sm:text-3xl">{card.value}건</div>
+              <div className="mt-1 text-[11px] font-semibold opacity-80 sm:text-xs">{card.note}</div>
             </Link>
           ))}
         </div>
 
-        <div className="mb-4 flex items-center justify-between border border-line bg-white px-4 py-3">
-          <Link className="button" href={`/?month=${prevMonth}`}>
+        <div className="mb-3 flex items-center justify-between border border-line bg-white px-3 py-2 sm:px-4 sm:py-3">
+          <Link className="button px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" href={`/?month=${prevMonth}`}>
             이전달
           </Link>
-          <div className="text-xl font-bold text-ink">{monthLabel(selectedMonth)}</div>
-          <Link className="button" href={`/?month=${nextMonth}`}>
+          <div className="text-base font-bold text-ink sm:text-xl">{monthLabel(selectedMonth)}</div>
+          <Link className="button px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm" href={`/?month=${nextMonth}`}>
             다음달
           </Link>
         </div>
 
-        <div className="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-4">
-          <section className="border border-line bg-white p-6 xl:col-span-2">
-            <p className="text-sm font-semibold text-slate-500">이번달 순수익</p>
-            <p className={`mt-3 text-4xl font-bold ${monthlyNetIncome >= 0 ? "text-emerald-700" : "text-red-700"}`}>
-              {won(monthlyNetIncome)}
-            </p>
-            <div className="mt-5 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
-              <div className="border border-slate-100 bg-slate-50 p-3">
-                <p className="font-semibold text-slate-500">입금완료</p>
-                <p className="mt-1 font-bold text-emerald-700">{won(monthlyPaidTotal)}</p>
-              </div>
-              <div className="border border-slate-100 bg-slate-50 p-3">
-                <p className="font-semibold text-slate-500">수리비</p>
-                <p className="mt-1 font-bold text-ink">{won(monthlyRepairTotal)}</p>
-              </div>
-              <div className="border border-slate-100 bg-slate-50 p-3">
-                <p className="font-semibold text-slate-500">부동산중개비</p>
-                <p className="mt-1 font-bold text-ink">{won(monthlyBrokerageTotal)}</p>
-              </div>
-            </div>
-          </section>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:col-span-2">
-            {monthlyStats.slice(0, 2).map((stat) => (
-              <div key={stat.label} className="border border-line bg-white p-5">
-                <p className="text-sm font-semibold text-slate-500">{stat.label}</p>
-                <p className={`mt-3 text-2xl font-bold ${stat.tone ?? "text-ink"}`}>{stat.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {monthlyStats.slice(2).map((stat) => (
-            <div key={stat.label} className="border border-line bg-white p-5">
+        <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {primaryStats.map((stat, index) => (
+            <div key={stat.label} className={`border border-line bg-white p-4 md:p-5 ${index === 0 ? "xl:col-span-2" : ""}`}>
               <p className="text-sm font-semibold text-slate-500">{stat.label}</p>
-              <p className={`mt-3 text-2xl font-bold ${stat.tone ?? "text-ink"}`}>{stat.value}</p>
+              <p className={`${index === 0 ? "mt-3 text-3xl md:text-4xl" : "mt-2 text-2xl"} font-bold ${stat.tone ?? "text-ink"}`}>
+                {stat.value}
+              </p>
+              {index === 0 ? (
+                <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                  <div className="border border-slate-100 bg-slate-50 p-3">
+                    <p className="font-semibold text-slate-500">입금완료</p>
+                    <p className="mt-1 font-bold text-emerald-700">{won(monthlyPaidTotal)}</p>
+                  </div>
+                  <div className="border border-slate-100 bg-slate-50 p-3">
+                    <p className="font-semibold text-slate-500">수리비</p>
+                    <p className="mt-1 font-bold text-ink">{won(monthlyRepairTotal)}</p>
+                  </div>
+                  <div className="border border-slate-100 bg-slate-50 p-3">
+                    <p className="font-semibold text-slate-500">중개비</p>
+                    <p className="mt-1 font-bold text-ink">{won(monthlyBrokerageTotal)}</p>
+                  </div>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
 
+        <details className="mb-6 border border-line bg-white p-4">
+          <summary className="cursor-pointer text-sm font-bold text-ink">더보기</summary>
+          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {moreMonthlyStats.map((stat) => (
+              <div key={stat.label} className="border border-slate-100 bg-slate-50 p-4">
+                <p className="text-sm font-semibold text-slate-500">{stat.label}</p>
+                <p className={`mt-2 text-xl font-bold ${stat.tone ?? "text-ink"}`}>{stat.value}</p>
+              </div>
+            ))}
+          </div>
+        </details>
+
         {isAdmin ? (
-          <section className="mt-8 border border-line bg-white p-5">
+          <section className="mt-6 border border-line bg-white p-4 md:p-5">
             <div className="mb-4 flex items-center justify-between gap-4">
               <h3 className="text-lg font-bold text-ink">최근 활동로그</h3>
               <Link className="button" href="/audit-logs">
@@ -388,11 +379,11 @@ export default async function DashboardPage({
           </section>
         ) : null}
 
-        <section className="mt-8 border border-line bg-white p-5">
+        <section className="mt-6 border border-line bg-white p-4 md:p-5">
           <h3 className="mb-4 text-lg font-bold text-ink">
             {selectedYear}년 1월~{Number(selectedMonth.slice(5, 7))}월 누적 요약
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
             {yearlyStats.map((stat) => (
               <div key={stat.label} className="border border-slate-100 bg-slate-50 p-4">
                 <p className="text-sm font-semibold text-slate-500">{stat.label}</p>

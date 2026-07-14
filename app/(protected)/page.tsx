@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { getCurrentAdminUser } from "@/lib/admin-auth";
 import { addMonths, monthKey, monthLabel, won } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { syncRentPaymentsForAllRooms } from "@/lib/rent-sync";
@@ -48,7 +49,8 @@ export default async function DashboardPage({
 
   await syncRentPaymentsForAllRooms();
 
-  const [depositAggregate, monthlyPayments, monthlyRepairs, yearlyPayments, yearlyRepairs] = await Promise.all([
+  const [adminUser, depositAggregate, monthlyPayments, monthlyRepairs, yearlyPayments, yearlyRepairs] = await Promise.all([
+    getCurrentAdminUser(),
     prisma.room.aggregate({
       where: {
         status: {
@@ -120,6 +122,7 @@ export default async function DashboardPage({
 
   const prevMonth = addMonths(selectedMonth, -1);
   const nextMonth = addMonths(selectedMonth, 1);
+  const isAdmin = adminUser?.role === "ADMIN";
   const monthlyStats = [
     { label: "총 보증금", value: won(totalDeposit) },
     { label: "선택월 월세 예정금액", value: won(monthlyRentTotal) },
@@ -153,7 +156,17 @@ export default async function DashboardPage({
 
   return (
     <>
-      <PageHeader title="대시보드" description={`${monthLabel(selectedMonth)} 기준 이건빌 현황`} />
+      <PageHeader
+        title="대시보드"
+        description={`${monthLabel(selectedMonth)} 기준 이건빌 현황`}
+        actions={
+          isAdmin ? (
+            <a className="button-primary" href="/api/backup">
+              백업 다운로드
+            </a>
+          ) : null
+        }
+      />
       <section className="p-8">
         <div className="mb-4 flex items-center justify-between border border-line bg-white px-4 py-3">
           <Link className="button" href={`/?month=${prevMonth}`}>

@@ -46,6 +46,17 @@ function rangeHref(range: { from: string; to: string }) {
   return `/tax?from=${range.from}&to=${range.to}`;
 }
 
+function InfoRow({ label, value, strong }: { label: string; value: React.ReactNode; strong?: boolean }) {
+  return (
+    <div className="flex items-start justify-between gap-3 text-sm">
+      <span className="shrink-0 text-slate-500">{label}</span>
+      <span className={`min-w-0 text-right break-words ${strong ? "font-bold text-ink" : "text-slate-700"}`}>
+        {value || "-"}
+      </span>
+    </div>
+  );
+}
+
 export default async function TaxPage({
   searchParams
 }: {
@@ -75,7 +86,7 @@ export default async function TaxPage({
               </Link>
             ))}
           </div>
-          <form className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto_auto]">
+          <form className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto]">
             <label className="grid gap-1 text-xs font-semibold text-slate-500">
               시작일
               <input name="from" type="date" defaultValue={report.from} />
@@ -89,12 +100,10 @@ export default async function TaxPage({
                 조회
               </button>
             </div>
-            <div className="flex items-end">
-              <a className="button w-full" href={downloadHref}>
-                Excel 다운로드
-              </a>
-            </div>
           </form>
+          <a className="button-primary mt-3 w-full md:w-auto" href={downloadHref}>
+            Excel 다운로드
+          </a>
         </div>
 
         <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -118,11 +127,43 @@ export default async function TaxPage({
         </div>
 
         <section className="mb-6 border border-line bg-white p-4">
-          <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-lg font-bold text-ink">임대수입 미리보기</h3>
             <span className="text-sm text-slate-500">금액 단위: 만원</span>
           </div>
-          <div className="table-wrap">
+
+          <div className="grid gap-3 md:hidden">
+            {report.incomes.slice(0, 50).map((income, index) => (
+              <article key={`${income.roomNumber}-${income.date}-${index}`} className="border border-slate-100 bg-slate-50 p-4">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-lg font-bold text-ink">{income.roomNumber}</p>
+                    <p className="mt-1 break-words text-sm text-slate-600">{income.tenantName || "-"}</p>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700">
+                    {paymentStatusText(income.status)}
+                  </span>
+                </div>
+                <div className="grid gap-2">
+                  <InfoRow label="날짜" value={income.date} />
+                  <InfoRow label="건물" value={income.building} />
+                  <InfoRow label="호실" value={income.roomNumber} />
+                  <InfoRow label="세입자" value={income.tenantName || "-"} />
+                  <InfoRow label="월세" value={<span className="text-emerald-700">{won(income.monthlyRent)}</span>} strong />
+                  <InfoRow label="관리비" value={income.managementFee || ""} />
+                  <InfoRow label="입금일" value={income.paidDate || "-"} />
+                  <InfoRow label="상태" value={paymentStatusText(income.status)} strong />
+                </div>
+              </article>
+            ))}
+            {report.incomes.length === 0 ? (
+              <div className="border border-slate-100 bg-slate-50 p-6 text-center text-sm text-slate-500">
+                선택한 기간의 임대수입 내역이 없습니다.
+              </div>
+            ) : null}
+          </div>
+
+          <div className="table-wrap hidden md:block">
             <table>
               <thead>
                 <tr>
@@ -167,11 +208,43 @@ export default async function TaxPage({
         </section>
 
         <section className="border border-line bg-white p-4">
-          <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-lg font-bold text-ink">필요경비 미리보기</h3>
             <span className="text-sm text-slate-500">금액 단위: 만원</span>
           </div>
-          <div className="table-wrap">
+
+          <div className="grid gap-3 md:hidden">
+            {report.expenses.slice(0, 50).map((expense, index) => (
+              <article key={`${expense.date}-${expense.content}-${index}`} className="border border-slate-100 bg-slate-50 p-4">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="break-words text-base font-bold text-ink">{expense.content}</p>
+                    <p className="mt-1 text-sm text-slate-600">{expense.date}</p>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700">
+                    {repairCategoryText(expense.category)}
+                  </span>
+                </div>
+                <div className="grid gap-2">
+                  <InfoRow label="날짜" value={expense.date} />
+                  <InfoRow label="건물" value={expense.building} />
+                  <InfoRow label="구분" value={repairCategoryText(expense.category)} />
+                  <InfoRow label="내용" value={expense.content} />
+                  <InfoRow label="금액" value={<span className="text-red-700">{won(expense.amount)}</span>} strong />
+                  <InfoRow label="거래처" value={expense.vendor || ""} />
+                  <InfoRow label="증빙" value={expense.evidence || ""} />
+                  <InfoRow label="부담자" value={repairPayerText(expense.payer)} strong />
+                </div>
+              </article>
+            ))}
+            {report.expenses.length === 0 ? (
+              <div className="border border-slate-100 bg-slate-50 p-6 text-center text-sm text-slate-500">
+                선택한 기간의 필요경비 내역이 없습니다.
+              </div>
+            ) : null}
+          </div>
+
+          <div className="table-wrap hidden md:block">
             <table>
               <thead>
                 <tr>

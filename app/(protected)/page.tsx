@@ -36,6 +36,24 @@ function sumAmounts<T>(items: T[], pick: (item: T) => number) {
   return items.reduce((sum, item) => sum + pick(item), 0);
 }
 
+function koreaDateParts(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "Asia/Seoul",
+    year: "numeric"
+  }).formatToParts(date);
+
+  const partMap = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+
+  return {
+    day: Number(partMap.day),
+    month: partMap.month,
+    monthKey: `${partMap.year}-${partMap.month}`,
+    year: partMap.year
+  };
+}
+
 export default async function DashboardPage({
   searchParams
 }: {
@@ -53,7 +71,21 @@ export default async function DashboardPage({
 
   await syncRentPaymentsForAllRooms();
 
-  const [adminUser, depositAggregate, monthlyPayments, monthlyRepairs, yearlyPayments, yearlyRepairs] = await Promise.all([
+  const todayKorea = koreaDateParts();
+  const selectedMonthEnd = `${addMonths(selectedMonth, 1)}-01`;
+
+  const [
+    adminUser,
+    depositAggregate,
+    monthlyPayments,
+    monthlyRepairs,
+    yearlyPayments,
+    yearlyRepairs,
+    dueTodayCount,
+    currentMonthOverdueCount,
+    selectedMonthMoveOutSoonCount,
+    vacantRoomCount
+  ] = await Promise.all([
     getCurrentAdminUser(),
     prisma.room.aggregate({
       where: {
@@ -81,6 +113,40 @@ export default async function DashboardPage({
           gte: new Date(selectedYear, 0, 1),
           lt: cumulativeDateEnd
         }
+      }
+    }),
+    prisma.rentPayment.count({
+      where: {
+        paymentMonth: todayKorea.monthKey,
+        status: {
+          not: "PAID"
+        },
+        room: {
+          rentDueDay: todayKorea.day,
+          status: {
+            in: ["OCCUPIED", "MOVE_OUT_SOON"]
+          }
+        }
+      }
+    }),
+    prisma.rentPayment.count({
+      where: {
+        paymentMonth: todayKorea.monthKey,
+        status: "OVERDUE"
+      }
+    }),
+    prisma.room.count({
+      where: {
+        status: "MOVE_OUT_SOON",
+        moveOutDate: {
+          gte: `${selectedMonth}-01`,
+          lt: selectedMonthEnd
+        }
+      }
+    }),
+    prisma.room.count({
+      where: {
+        status: "VACANT"
       }
     })
   ]);
@@ -145,6 +211,36 @@ export default async function DashboardPage({
       tone: monthlyNetIncome >= 0 ? "text-emerald-700" : "text-red-700"
     }
   ];
+  const alertCards = [
+    {
+      href: "/payments",
+      label: "오늘 입금 예정",
+      note: "오늘 기준",
+      tone: "border-red-100 bg-red-50 text-red-700",
+      value: dueTodayCount
+    },
+    {
+      href: "/payments",
+      label: "미납",
+      note: "현재 월 기준",
+      tone: "border-orange-100 bg-orange-50 text-orange-700",
+      value: currentMonthOverdueCount
+    },
+    {
+      href: "/move",
+      label: "퇴실 예정",
+      note: "선택월 기준",
+      tone: "border-yellow-100 bg-yellow-50 text-yellow-700",
+      value: selectedMonthMoveOutSoonCount
+    },
+    {
+      href: "/rooms",
+      label: "공실",
+      note: "현재 상태",
+      tone: "border-emerald-100 bg-emerald-50 text-emerald-700",
+      value: vacantRoomCount
+    }
+  ];
   const yearlyStats = [
     { label: "올해 총 월세 예정금액", value: won(yearlyRentTotal) },
     { label: "올해 총 입금완료 금액", value: won(yearlyPaidTotal), tone: "text-emerald-700" },
@@ -180,6 +276,16 @@ export default async function DashboardPage({
             백업 복원이 완료되었습니다.
           </div>
         ) : null}
+
+        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {alertCards.map((card) => (
+            <Link key={card.label} className={`border p-5 transition hover:shadow-sm ${card.tone}`} href={card.href}>
+              <div className="text-sm font-semibold">{card.label}</div>
+              <div className="mt-2 text-3xl font-bold">{card.value}건</div>
+              <div className="mt-2 text-xs font-semibold opacity-80">{card.note}</div>
+            </Link>
+          ))}
+        </div>
 
         <div className="mb-4 flex items-center justify-between border border-line bg-white px-4 py-3">
           <Link className="button" href={`/?month=${prevMonth}`}>

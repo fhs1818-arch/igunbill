@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { RestoreBackupForm } from "@/components/RestoreBackupForm";
 import { QuickRoomSearch } from "@/components/QuickRoomSearch";
+import { PwaInstallButton } from "@/components/PwaInstallButton";
 
 type MenuItem = {
   href: string;
@@ -130,6 +131,9 @@ export function AppNavigation({ isAdmin, menus, signOutAction }: AppNavigationPr
                 <AdminMenu />
               </div>
             ) : null}
+            <div className="border-t border-line p-3">
+              <PwaInstallButton />
+            </div>
             <form action={signOutAction} className="border-t border-line p-3">
               <button className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">
                 로그아웃

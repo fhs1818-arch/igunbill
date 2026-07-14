@@ -62,6 +62,15 @@ function addDaysToDateString(value: string, days: number) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
+function CountText({ value }: { value: number }) {
+  return (
+    <span className="inline-flex items-baseline whitespace-nowrap tabular-nums">
+      <span className="font-extrabold">{value}</span>
+      <span className="ml-0.5 text-[0.72em] font-semibold">건</span>
+    </span>
+  );
+}
+
 export default async function DashboardPage({
   searchParams
 }: {
@@ -241,7 +250,7 @@ export default async function DashboardPage({
     {
       href: "/rooms",
       label: "공실",
-      value: `${vacantRoomCount}건`
+      value: <CountText value={vacantRoomCount} />
     }
   ];
   const yearlyStats = [
@@ -291,18 +300,20 @@ export default async function DashboardPage({
         </AppCard>
 
         <section>
-          <h2 className="mb-2 text-base font-extrabold text-ink">오늘 해야 할 일</h2>
+          <h2 className="mb-2 text-base font-bold text-ink">오늘 해야 할 일</h2>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
             {taskCards.map(({ Icon, ...card }) => (
               <Link key={card.label} href={card.href} className="block active:scale-[0.99] md:hover:-translate-y-0.5 md:hover:transition-transform">
                 <AppCard className="h-full p-3 transition md:hover:border-brand">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-bold text-slate-600">{card.label}</p>
+                    <p className="text-sm font-semibold text-slate-600">{card.label}</p>
                     <div className={`rounded-lg p-1.5 ${card.toneClass}`}>
                       <Icon className="h-5 w-5" />
                     </div>
                   </div>
-                  <p className="mt-2 text-2xl font-extrabold text-ink">{card.value}건</p>
+                  <p className="mt-2 text-[1.65rem] font-bold leading-tight text-ink">
+                    <CountText value={card.value} />
+                  </p>
                 </AppCard>
               </Link>
             ))}
@@ -310,7 +321,7 @@ export default async function DashboardPage({
         </section>
 
         <section>
-          <h2 className="mb-2 text-base font-extrabold text-ink">건물 현황</h2>
+          <h2 className="mb-2 text-base font-bold text-ink">건물 현황</h2>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
             {buildingCards.map((card) =>
               card.href ? (
@@ -325,7 +336,7 @@ export default async function DashboardPage({
         </section>
 
         <section>
-          <h2 className="mb-2 text-base font-extrabold text-ink">이번 달 지출</h2>
+          <h2 className="mb-2 text-base font-bold text-ink">이번 달 지출</h2>
           <div className="grid grid-cols-2 gap-2">
             <StatCard className="p-3" label="수리비" value={<MoneyText amount={monthlyRepairTotal} />} />
             <StatCard className="p-3" label="중개비" value={<MoneyText amount={monthlyBrokerageTotal} />} />
@@ -333,7 +344,7 @@ export default async function DashboardPage({
         </section>
 
         <details className="rounded-lg border border-line bg-white p-3 shadow-sm shadow-slate-200/40">
-          <summary className="cursor-pointer list-none text-base font-extrabold text-ink">
+          <summary className="cursor-pointer list-none text-base font-bold text-ink">
             연간 누적 요약
           </summary>
           <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">

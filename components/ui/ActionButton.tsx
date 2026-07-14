@@ -23,7 +23,7 @@ const variantClass = {
 };
 
 const baseClass =
-  "inline-flex min-h-10 items-center justify-center rounded-lg border px-3 py-2 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex min-h-10 items-center justify-center rounded-lg border px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60";
 
 export function ActionButton({ children, className = "", variant = "secondary", ...props }: ActionButtonProps) {
   return (

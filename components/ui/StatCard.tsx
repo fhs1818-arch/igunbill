@@ -21,7 +21,7 @@ export function StatCard({ label, value, description, tone = "default", classNam
   return (
     <AppCard className={className}>
       <p className="text-sm font-semibold text-slate-500">{label}</p>
-      <p className={`mt-2 text-2xl font-bold ${toneClass[tone]}`}>{value}</p>
+      <p className={`mt-2 text-[1.65rem] font-bold leading-tight ${toneClass[tone]}`}>{value}</p>
       {description ? <p className="mt-1 text-xs leading-5 text-slate-500">{description}</p> : null}
     </AppCard>
   );

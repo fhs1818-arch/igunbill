@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { MoneyText } from "@/components/ui/MoneyText";
 import { requireAdmin } from "@/lib/admin-auth";
-import { dateInput, won } from "@/lib/format";
+import { dateInput } from "@/lib/format";
 import {
   getTaxReport,
   normalizeTaxRange,
@@ -109,18 +110,22 @@ export default async function TaxPage({
         <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
           <div className="border border-line bg-white p-4">
             <p className="text-sm font-semibold text-slate-500">총수입</p>
-            <p className="mt-2 text-2xl font-bold text-emerald-700">{won(report.summary.totalIncome)}</p>
+            <p className="mt-2 text-[1.65rem] font-bold leading-tight text-emerald-700">
+              <MoneyText amount={report.summary.totalIncome} tone="positive" />
+            </p>
             <p className="mt-1 text-xs text-slate-500">입금완료 월세 기준</p>
           </div>
           <div className="border border-line bg-white p-4">
             <p className="text-sm font-semibold text-slate-500">총지출</p>
-            <p className="mt-2 text-2xl font-bold text-red-700">{won(report.summary.totalExpense)}</p>
+            <p className="mt-2 text-[1.65rem] font-bold leading-tight text-red-700">
+              <MoneyText amount={report.summary.totalExpense} tone="negative" />
+            </p>
             <p className="mt-1 text-xs text-slate-500">임대인 부담 경비 기준</p>
           </div>
           <div className="border border-line bg-white p-4">
             <p className="text-sm font-semibold text-slate-500">순수익</p>
-            <p className={`mt-2 text-2xl font-bold ${report.summary.netIncome >= 0 ? "text-emerald-700" : "text-red-700"}`}>
-              {won(report.summary.netIncome)}
+            <p className={`mt-2 text-[1.65rem] font-bold leading-tight ${report.summary.netIncome >= 0 ? "text-emerald-700" : "text-red-700"}`}>
+              <MoneyText amount={report.summary.netIncome} tone={report.summary.netIncome >= 0 ? "positive" : "negative"} />
             </p>
             <p className="mt-1 text-xs text-slate-500">총수입 - 총지출</p>
           </div>
@@ -149,7 +154,7 @@ export default async function TaxPage({
                   <InfoRow label="건물" value={income.building} />
                   <InfoRow label="호실" value={income.roomNumber} />
                   <InfoRow label="세입자" value={income.tenantName || "-"} />
-                  <InfoRow label="월세" value={<span className="text-emerald-700">{won(income.monthlyRent)}</span>} strong />
+                  <InfoRow label="월세" value={<MoneyText amount={income.monthlyRent} tone="positive" />} strong />
                   <InfoRow label="관리비" value={income.managementFee || ""} />
                   <InfoRow label="입금일" value={income.paidDate || "-"} />
                   <InfoRow label="상태" value={paymentStatusText(income.status)} strong />
@@ -185,7 +190,7 @@ export default async function TaxPage({
                     <td>{income.building}</td>
                     <td>{income.roomNumber}</td>
                     <td>{income.tenantName || "-"}</td>
-                    <td>{won(income.monthlyRent)}</td>
+                    <td><MoneyText amount={income.monthlyRent} /></td>
                     <td>{income.managementFee || ""}</td>
                     <td>{income.paidDate || "-"}</td>
                     <td>{paymentStatusText(income.status)}</td>
@@ -230,7 +235,7 @@ export default async function TaxPage({
                   <InfoRow label="건물" value={expense.building} />
                   <InfoRow label="구분" value={repairCategoryText(expense.category)} />
                   <InfoRow label="내용" value={expense.content} />
-                  <InfoRow label="금액" value={<span className="text-red-700">{won(expense.amount)}</span>} strong />
+                  <InfoRow label="금액" value={<MoneyText amount={expense.amount} tone="negative" />} strong />
                   <InfoRow label="거래처" value={expense.vendor || ""} />
                   <InfoRow label="증빙" value={expense.evidence || ""} />
                   <InfoRow label="부담자" value={repairPayerText(expense.payer)} strong />
@@ -265,7 +270,7 @@ export default async function TaxPage({
                     <td>{expense.building}</td>
                     <td>{repairCategoryText(expense.category)}</td>
                     <td>{expense.content}</td>
-                    <td>{won(expense.amount)}</td>
+                    <td><MoneyText amount={expense.amount} /></td>
                     <td>{expense.vendor}</td>
                     <td>{expense.evidence}</td>
                     <td>{repairPayerText(expense.payer)}</td>

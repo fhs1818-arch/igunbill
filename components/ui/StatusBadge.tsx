@@ -16,7 +16,7 @@ const toneClass = {
 
 export function StatusBadge({ children, tone = "default", className = "" }: StatusBadgeProps) {
   return (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${toneClass[tone]} ${className}`}>
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${toneClass[tone]} ${className}`}>
       {children}
     </span>
   );

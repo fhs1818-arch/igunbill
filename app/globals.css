@@ -2,9 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 45 920;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/woff2/PretendardVariable.woff2")
+    format("woff2-variations");
+}
+
 :root {
   color: #17202a;
   background: #f7f8fa;
+  font-family: Pretendard, system-ui, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
 }
 
 * {
@@ -12,6 +22,8 @@
 }
 
 body {
+  font-family: Pretendard, system-ui, "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+  font-weight: 400;
   margin: 0;
 }
 
@@ -24,6 +36,8 @@ body {
 input,
 select,
 textarea {
+  font-family: inherit;
+  font-weight: 400;
   @apply rounded-md border border-line bg-white px-2.5 py-2 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-blue-100;
 }
 
@@ -33,6 +47,7 @@ textarea {
 
 button,
 .button {
+  font-family: inherit;
   @apply inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50;
 }
 

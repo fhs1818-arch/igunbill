@@ -7,6 +7,7 @@ import { RoomHashHighlighter } from "@/components/RoomHashHighlighter";
 import { ActionButton, ActionLink } from "@/components/ui/ActionButton";
 import { AppCard } from "@/components/ui/AppCard";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { MoneyText } from "@/components/ui/MoneyText";
 import { Section } from "@/components/ui/Section";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
@@ -128,11 +129,11 @@ export default async function RoomsPage() {
                 <div className="grid gap-3 rounded-lg bg-slate-50 p-3 text-sm">
                   <div className="flex justify-between gap-3">
                     <span className="text-slate-500">보증금</span>
-                    <span className="font-bold text-ink">{won(room.deposit)}</span>
+                    <MoneyText amount={room.deposit} />
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-slate-500">월세</span>
-                    <span className="font-bold text-ink">{won(room.monthlyRent)}</span>
+                    <MoneyText amount={room.monthlyRent} />
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-slate-500">납부일</span>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
+import { AUDIT_ACTIONS, writeAuditLog } from "@/lib/audit-log";
 import { prisma } from "@/lib/prisma";
 
 function todayFileStamp() {
@@ -35,6 +36,16 @@ export async function GET() {
   };
 
   const fileName = `igunbill-backup-${todayFileStamp()}.json`;
+  await writeAuditLog({
+    action: AUDIT_ACTIONS.BACKUP_DOWNLOAD,
+    targetType: "Backup",
+    description: "백업 JSON 파일을 다운로드했습니다.",
+    metadata: {
+      roomsCount: rooms.length,
+      rentPaymentsCount: rentPayments.length,
+      repairsCount: repairs.length
+    }
+  });
 
   return new NextResponse(JSON.stringify(backup, null, 2), {
     headers: {

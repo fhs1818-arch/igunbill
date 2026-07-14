@@ -44,6 +44,23 @@ model AdminUser {
   updatedAt DateTime @updatedAt
 }
 
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  userEmail   String
+  userRole    UserRole
+  action      String
+  targetType  String
+  targetId    String?
+  description String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userEmail])
+  @@index([action])
+  @@index([targetType])
+}
+
 model Room {
   id          Int           @id @default(autoincrement())
   roomNumber  String        @unique

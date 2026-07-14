@@ -5,7 +5,7 @@ import { AdminRoleProvider } from "@/components/AdminRoleProvider";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const menus = [
+const baseMenus = [
   { href: "/", label: "대시보드" },
   { href: "/rooms", label: "호실관리" },
   { href: "/payments", label: "월세입금관리" },
@@ -32,6 +32,10 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   if (!adminUser) {
     redirect("/unauthorized");
   }
+  const menus =
+    adminUser.role === "ADMIN"
+      ? [...baseMenus, { href: "/audit-logs", label: "활동 로그" }]
+      : baseMenus;
 
   return (
     <AdminRoleProvider role={adminUser.role}>

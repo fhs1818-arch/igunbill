@@ -7,6 +7,7 @@ import {
   type Prisma
 } from "@prisma/client";
 import { getCurrentAdminUser } from "@/lib/admin-auth";
+import { AUDIT_ACTIONS, writeAuditLog } from "@/lib/audit-log";
 import { prisma } from "@/lib/prisma";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -276,6 +277,17 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ message: "백업 복원 중 오류가 발생했습니다. 데이터는 변경되지 않았습니다." }, { status: 500 });
   }
+
+  await writeAuditLog({
+    action: AUDIT_ACTIONS.BACKUP_RESTORE,
+    targetType: "Backup",
+    description: "백업 JSON 파일을 복원했습니다.",
+    metadata: {
+      roomsCount: rooms.length,
+      rentPaymentsCount: rentPayments.length,
+      repairsCount: repairs.length
+    }
+  });
 
   return NextResponse.json({ message: "백업 복원이 완료되었습니다." });
 }

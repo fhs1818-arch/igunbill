@@ -6,6 +6,13 @@ export async function middleware(request: NextRequest) {
     request
   });
 
+  const publicPwaPaths = ["/manifest.webmanifest", "/sw.js", "/offline"];
+  const pathname = request.nextUrl.pathname;
+
+  if (publicPwaPaths.includes(pathname) || pathname.startsWith("/icons/")) {
+    return response;
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   const isLoginPage = request.nextUrl.pathname === "/login";
